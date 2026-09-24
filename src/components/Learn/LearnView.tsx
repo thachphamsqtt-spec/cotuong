@@ -244,14 +244,13 @@ export const LearnView: React.FC<LearnViewProps> = ({ pieceSet }) => {
           {CURRICULUM.filter((l) => l.level === selectedLevelTab).map((lesson) => {
             const isDone = progress.completedLessons.includes(lesson.id);
             const isSelected = selectedLesson.id === lesson.id;
-            const isUnlocked = lesson.level <= progress.unlockedLevel;
 
             return (
               <button
                 key={lesson.id}
                 className={`lesson-item-btn ${isSelected ? 'active' : ''} ${isDone ? 'done' : ''}`}
                 onClick={() => handleLessonSelect(lesson)}
-                disabled={!isUnlocked}
+                title={`Học bài: ${lesson.title}`}
               >
                 <span className="lesson-badge">{isDone ? '✓' : '•'}</span>
                 <div className="lesson-info">
