@@ -3665,3 +3665,184 @@ input:checked + .slider:before {
   color: var(--text-muted);
 }
 
+/* ==========================================================================
+   MOBILE BOTTOM NAVIGATION & RESPONSIVE UX OPTIMIZATIONS
+   ========================================================================== */
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Hide Desktop Nav in Header */
+  .main-navbar .nav-tab-group {
+    display: none;
+  }
+
+  .main-navbar {
+    padding: 8px 12px;
+  }
+
+  .brand-text .brand-tagline {
+    display: none;
+  }
+
+  .brand-text .brand-name {
+    font-size: 1.1rem;
+  }
+
+  /* Reserve Bottom Space for Bottom Nav Bar */
+  .app-root {
+    padding-bottom: calc(68px + env(safe-area-inset-bottom, 8px));
+  }
+
+  .main-content-area {
+    padding: 6px 8px;
+  }
+
+  /* Fixed Mobile Bottom Navigation Bar */
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: rgba(18, 14, 10, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(212, 175, 55, 0.3);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px)) 4px;
+    justify-content: space-around;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    touch-action: manipulation;
+  }
+
+  [data-theme='light'] .mobile-bottom-nav {
+    background: rgba(255, 250, 240, 0.95);
+    border-top: 1px solid #d4af37;
+    box-shadow: 0 -4px 15px rgba(180, 140, 50, 0.15);
+  }
+
+  .mobile-tab-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 4px 2px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-tab-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    transition: transform 0.2s ease;
+  }
+
+  .mobile-tab-text {
+    font-size: 0.68rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .mobile-tab-btn.active {
+    color: var(--gold-accent);
+    transform: translateY(-2px);
+  }
+
+  .mobile-tab-btn.active .mobile-tab-icon {
+    transform: scale(1.18);
+    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.7));
+  }
+
+  /* Single Column Body Grid for All Views on Mobile */
+  .play-body,
+  .practice-body,
+  .learn-body,
+  .analysis-body,
+  .editor-body {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    width: 100%;
+  }
+
+  /* Optimized Mobile Board Dimensions */
+  .xiangqi-board {
+    width: min(96vw, calc((100dvh - 270px) * 0.9), 420px) !important;
+    max-height: calc(100dvh - 270px) !important;
+    box-shadow: var(--shadow-lg), 0 0 0 5px #70471e, 0 0 0 7px #3f250e !important;
+    border-radius: 8px;
+  }
+
+  .player-clock {
+    width: min(96vw, calc((100dvh - 270px) * 0.9), 420px) !important;
+    padding: 5px 10px !important;
+    margin: 4px auto !important;
+  }
+
+  .clock-digits {
+    font-size: 1.15rem !important;
+  }
+
+  .piece-char {
+    font-size: clamp(1.15rem, 5.5vw, 1.75rem);
+  }
+
+  /* Mobile Toolbar with Horizontal Touch Scrolling */
+  .play-topbar {
+    padding: 8px 10px !important;
+    gap: 8px !important;
+  }
+
+  .play-topbar-history-actions {
+    width: 100% !important;
+    display: flex !important;
+    overflow-x: auto !important;
+    padding-bottom: 2px !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .play-topbar-history-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .play-topbar-history-actions .btn-sm {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Mobile Play Actions Row */
+  .play-actions-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 5px !important;
+  }
+
+  .play-actions-grid button {
+    padding: 8px 4px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .play-actions-grid .mini-kbd {
+    display: none;
+  }
+
+  /* Dialogs & Modals Full Width on Mobile */
+  .game-history-modal,
+  .shortcuts-modal,
+  .settings-modal,
+  .game-over-modal {
+    width: min(95vw, 540px) !important;
+    max-height: 88dvh !important;
+    border-radius: var(--radius-md) !important;
+  }
+}
+
+

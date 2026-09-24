@@ -165,6 +165,55 @@ export default function App() {
         )}
       </main>
 
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="mobile-bottom-nav" role="tablist" aria-label="Điều hướng di động">
+        <button
+          className={`mobile-tab-btn ${activeTab === 'learn' ? 'active' : ''}`}
+          onClick={() => setActiveTab('learn')}
+          role="tab"
+          aria-selected={activeTab === 'learn'}
+        >
+          <span className="mobile-tab-icon">🎓</span>
+          <span className="mobile-tab-text">Học Cờ</span>
+        </button>
+        <button
+          className={`mobile-tab-btn ${activeTab === 'practice' ? 'active' : ''}`}
+          onClick={() => setActiveTab('practice')}
+          role="tab"
+          aria-selected={activeTab === 'practice'}
+        >
+          <span className="mobile-tab-icon">🧩</span>
+          <span className="mobile-tab-text">Luyện Tập</span>
+        </button>
+        <button
+          className={`mobile-tab-btn ${activeTab === 'play' ? 'active' : ''}`}
+          onClick={() => setActiveTab('play')}
+          role="tab"
+          aria-selected={activeTab === 'play'}
+        >
+          <span className="mobile-tab-icon">⚔️</span>
+          <span className="mobile-tab-text">Đấu Máy</span>
+        </button>
+        <button
+          className={`mobile-tab-btn ${activeTab === 'analysis' ? 'active' : ''}`}
+          onClick={() => setActiveTab('analysis')}
+          role="tab"
+          aria-selected={activeTab === 'analysis'}
+        >
+          <span className="mobile-tab-icon">🔍</span>
+          <span className="mobile-tab-text">Phân Tích</span>
+        </button>
+        <button
+          className={`mobile-tab-btn ${activeTab === 'editor' ? 'active' : ''}`}
+          onClick={() => setActiveTab('editor')}
+          role="tab"
+          aria-selected={activeTab === 'editor'}
+        >
+          <span className="mobile-tab-icon">♟️</span>
+          <span className="mobile-tab-text">Xếp Cờ</span>
+        </button>
+      </nav>
+
       {/* Settings Modal */}
       {settingsOpen && (
         <div className="modal-overlay" onClick={() => setSettingsOpen(false)}>
