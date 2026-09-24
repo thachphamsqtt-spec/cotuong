@@ -4518,11 +4518,51 @@ input:checked + .slider:before {
 .created-room-box {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   background: rgba(212, 175, 55, 0.08);
-  border: 1px dashed var(--gold-accent);
+  border: 1.5px dashed var(--gold-accent);
   border-radius: var(--radius-md);
-  padding: 12px;
+  padding: 14px;
+}
+
+.room-host-status {
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px 10px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.text-success {
+  color: #2ecc71 !important;
+  font-weight: 700;
+}
+
+.joined-room-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(46, 204, 113, 0.08);
+  border: 1.5px solid #2ecc71;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  text-align: center;
+}
+
+.joined-room-meta {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.wait-host-text {
+  font-size: 0.8rem;
+  color: var(--gold-accent);
+  margin-top: 6px;
+  font-weight: 600;
+  animation: pulseDot 1.6s infinite ease-in-out;
 }
 
 .room-code-tag {
@@ -4532,9 +4572,9 @@ input:checked + .slider:before {
 }
 
 .room-code-tag strong {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   color: var(--gold-accent);
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   font-family: monospace;
 }
 
@@ -4545,7 +4585,7 @@ input:checked + .slider:before {
   border: 1.5px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--gold-accent);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: 2px;
   text-align: center;
@@ -4583,6 +4623,76 @@ input:checked + .slider:before {
 @keyframes pulseDot {
   0%, 100% { transform: scale(0.9); opacity: 0.6; }
   50% { transform: scale(1.3); opacity: 1; }
+}
+
+/* Online Active In-Game Room Header */
+.online-in-game-header-bar {
+  width: min(96vw, calc((100dvh - 200px) * 0.9), 540px);
+  margin: 0 auto 6px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+}
+
+.room-info-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+
+.room-badge {
+  color: var(--text-muted);
+}
+
+.room-badge strong {
+  color: var(--gold-accent);
+  font-family: monospace;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+}
+
+.status-dot-live {
+  color: #2ecc71;
+  font-size: 0.9rem;
+  animation: pulseDot 1.2s infinite ease-in-out;
+}
+
+.room-opp-name {
+  color: var(--text-secondary);
+}
+
+.room-header-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-tiny-action {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-tiny-action:hover {
+  background: var(--gold-accent);
+  color: #111;
+  border-color: var(--gold-accent);
+}
+
+.btn-tiny-action.btn-danger-action:hover {
+  background: #e74c3c;
+  color: #fff;
+  border-color: #e74c3c;
 }
 
 /* Online Board & Emoji Overlay */

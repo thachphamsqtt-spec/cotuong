@@ -38,13 +38,16 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     reason: string;
   } | null>(null);
 
-  // --- Online P2P State ---
+  // ---  // Online State
   const [playerName, setPlayerName] = useState<string>(() => {
     return localStorage.getItem('cotuong_player_name') || `Kỳ Thủ ${Math.floor(100 + Math.random() * 900)}`;
   });
   const [onlineHostSide, setOnlineHostSide] = useState<Side | 'random'>('random');
   const [onlineTimeControl, setOnlineTimeControl] = useState<'none' | '5m' | '10m' | '15m'>('10m');
   const [myRoomCode, setMyRoomCode] = useState<string>('');
+  const [currentOnlineRoomCode, setCurrentOnlineRoomCode] = useState<string>('');
+  const [roomHostName, setRoomHostName] = useState<string>('');
+  const [isGuestJoined, setIsGuestJoined] = useState<boolean>(false);
   const [joinCodeInput, setJoinCodeInput] = useState<string>('');
   const [isHosting, setIsHosting] = useState<boolean>(false);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
@@ -88,8 +91,10 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     const urlParams = new URLSearchParams(window.location.search);
     const roomParam = urlParams.get('room');
     if (roomParam) {
+      const clean = roomParam.trim().replace(/^cotuong-p2p-/i, '').toUpperCase();
       setModeTab('online');
-      setJoinCodeInput(roomParam.toUpperCase());
+      setJoinCodeInput(clean);
+      setOnlineStatusMessage(`Đã nhận diện liên kết phòng [${clean}]. Bấm "Vào Phòng Ngay" để tham gia!`);
     }
   }, []);
 
@@ -294,13 +299,23 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     return {
       onPeerReady: (code: string) => {
         setMyRoomCode(code);
+        setCurrentOnlineRoomCode(code);
         setIsHosting(true);
         setIsConnecting(false);
-        setOnlineStatusMessage(`Đã tạo phòng! Mã phòng: ${code}`);
+        setOnlineStatusMessage(`Đã tạo phòng [${code}]! Hãy gửi link hoặc mã phòng cho bạn bè.`);
       },
       onConnected: (peerName: string) => {
         setOpponentName(peerName || 'Kỳ Thủ');
-        setOnlineStatusMessage(`Đã kết nối với ${peerName}! Chuẩn bị vào trận...`);
+        setIsConnecting(false);
+        setOnlineStatusMessage(`🟢 Đã kết nối với [${peerName}]!`);
+      },
+      onRoomInfo: (info: { roomCode: string; hostName: string }) => {
+        setCurrentOnlineRoomCode(info.roomCode);
+        setRoomHostName(info.hostName);
+        setOpponentName(info.hostName);
+        setIsGuestJoined(true);
+        setIsConnecting(false);
+        setOnlineStatusMessage(`🟢 Đã vào phòng [${info.roomCode}] của [${info.hostName}]!`);
       },
       onDisconnected: () => {
         setOnlineStatusMessage('Đối thủ đã rời phòng hoặc mất kết nối mạng.');
@@ -310,9 +325,12 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
           reason: 'Đối thủ đã ngắt kết nối khỏi ván đấu.',
         });
       },
-      onGameStart: (config: { mySide: Side; timeControl: string; opponentName: string }) => {
+      onGameStart: (config: { mySide: Side; timeControl: string; opponentName: string; roomCode: string }) => {
         setMySide(config.mySide);
         setOpponentName(config.opponentName);
+        if (config.roomCode) {
+          setCurrentOnlineRoomCode(config.roomCode);
+        }
         const newG = new XiangqiGame();
         setOnlineGame(newG);
         initialOnlineBoardRef.current = newG.getBoard();
@@ -417,7 +435,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
         setTimeout(() => setRecentEmojiReaction(null), 3000);
       },
       onError: (err: string) => {
-        setOnlineStatusMessage(`Lỗi: ${err}`);
+        setOnlineStatusMessage(`⚠️ ${err}`);
         setIsConnecting(false);
       },
     };
@@ -445,24 +463,39 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
 
   const handleJoinRoom = async () => {
     if (!joinCodeInput.trim()) return;
+    const clean = joinCodeInput.trim().replace(/^cotuong-p2p-/i, '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
     setIsConnecting(true);
-    setOnlineStatusMessage(`Đang tìm và kết nối tới phòng ${joinCodeInput}...`);
+    setOnlineStatusMessage(`Đang tìm và kết nối tới phòng [${clean}]...`);
 
     try {
       await p2pService.init(playerName, setupP2PCallbacks());
-      await p2pService.joinRoom(joinCodeInput, playerName);
-      setOnlineStatusMessage('Đã vào phòng! Đang chờ chủ phòng bắt đầu...');
+      await p2pService.joinRoom(clean, playerName);
+      setOnlineStatusMessage(`Đã kết nối tới phòng [${clean}]! Đang chờ thông tin từ chủ phòng...`);
     } catch (e: any) {
-      setOnlineStatusMessage('Không thể kết nối vào phòng. Vui lòng kiểm tra lại mã.');
+      setOnlineStatusMessage(`Không thể kết nối vào phòng [${clean}]. Vui lòng kiểm tra lại mã.`);
       setIsConnecting(false);
     }
   };
 
   const handleCopyInviteLink = () => {
-    const url = `${window.location.origin}${window.location.pathname}?room=${myRoomCode}`;
+    const code = currentOnlineRoomCode || myRoomCode;
+    const url = `${window.location.origin}${window.location.pathname}?room=${code}`;
     navigator.clipboard.writeText(url);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2500);
+  };
+
+  const handleLeaveOnlineRoom = () => {
+    if (window.confirm('Bạn có chắc chắn muốn rời phòng đấu trực tuyến?')) {
+      p2pService.disconnect();
+      setOnlineGameActive(false);
+      setIsHosting(false);
+      setIsGuestJoined(false);
+      setCurrentOnlineRoomCode('');
+      setMyRoomCode('');
+      setOnlineGameOverModal(null);
+      setOnlineStatusMessage('Đã rời phòng đấu.');
+    }
   };
 
   const handleOnlineSquareClick = (sq: Square) => {
@@ -817,11 +850,20 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
                         <div className="room-code-tag">
                           MÃ PHÒNG: <strong>{myRoomCode}</strong>
                         </div>
+                        <div className="room-host-status">
+                          👑 Chủ phòng: <strong>{playerName}</strong>
+                          <br />
+                          {opponentName !== 'Đối Thủ' ? (
+                            <span className="text-success">🟢 Đã có người vào: <strong>{opponentName}</strong></span>
+                          ) : (
+                            <span className="text-muted">⏳ Đang đợi bạn bè tham gia...</span>
+                          )}
+                        </div>
                         <button className="btn-secondary full-width" onClick={handleCopyInviteLink}>
                           {copySuccess ? '✓ Đã chép Link Mời!' : '📋 Sao Chép Link Mời'}
                         </button>
                         <button className="btn-primary full-width mt-2" onClick={handleStartGameAsHost}>
-                          🚀 Bắt đầu trận đấu
+                          🚀 Bắt đầu ván đấu
                         </button>
                       </div>
                     )}
@@ -830,22 +872,41 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
                   {/* JOIN ROOM COLUMN */}
                   <div className="lobby-box">
                     <h3>🚀 Tham Gia Phòng</h3>
-                    <p className="box-desc">Nhập mã phòng 6 ký tự do bạn bè chia sẻ:</p>
-                    <input
-                      type="text"
-                      className="room-code-input"
-                      placeholder="VD: CT-98241"
-                      value={joinCodeInput}
-                      onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
-                      maxLength={12}
-                    />
-                    <button
-                      className="btn-primary full-width mt-2"
-                      onClick={handleJoinRoom}
-                      disabled={isConnecting || !joinCodeInput.trim()}
-                    >
-                      {isConnecting ? '⏳ Đang kết nối...' : '👉 Vào Phòng Ngay'}
-                    </button>
+                    {!isGuestJoined ? (
+                      <>
+                        <p className="box-desc">Nhập mã phòng 6 ký tự do bạn bè chia sẻ:</p>
+                        <input
+                          type="text"
+                          className="room-code-input"
+                          placeholder="VD: YMG3FQ"
+                          value={joinCodeInput}
+                          onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
+                          maxLength={12}
+                        />
+                        <button
+                          className="btn-primary full-width mt-2"
+                          onClick={handleJoinRoom}
+                          disabled={isConnecting || !joinCodeInput.trim()}
+                        >
+                          {isConnecting ? '⏳ Đang kết nối...' : '👉 Vào Phòng Ngay'}
+                        </button>
+                      </>
+                    ) : (
+                      <div className="joined-room-card">
+                        <div className="room-code-tag">
+                          PHÒNG: <strong>{currentOnlineRoomCode}</strong>
+                        </div>
+                        <div className="joined-room-meta">
+                          👑 Chủ phòng: <strong>{roomHostName || opponentName}</strong>
+                          <br />
+                          <span className="text-success">🟢 Đã vào phòng thành công!</span>
+                          <p className="wait-host-text">Đang đợi chủ phòng bấm bắt đầu ván đấu...</p>
+                        </div>
+                        <button className="btn-secondary btn-sm full-width mt-2" onClick={handleLeaveOnlineRoom}>
+                          ✕ Rời phòng
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -861,6 +922,23 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
             /* --- ONLINE IN-GAME BOARD VIEW --- */
             <>
               <div className="board-column">
+                {/* Online Active Room Info Header Bar */}
+                <div className="online-in-game-header-bar">
+                  <div className="room-info-pill">
+                    <span className="room-badge">PHÒNG: <strong>{currentOnlineRoomCode || myRoomCode}</strong></span>
+                    <span className="status-dot-live">●</span>
+                    <span className="room-opp-name">vs <strong>{opponentName}</strong></span>
+                  </div>
+                  <div className="room-header-actions">
+                    <button className="btn-tiny-action" onClick={handleCopyInviteLink} title="Sao chép link phòng">
+                      {copySuccess ? '✓ Đã chép' : '📋 Link'}
+                    </button>
+                    <button className="btn-tiny-action btn-danger-action" onClick={handleLeaveOnlineRoom} title="Rời phòng">
+                      🚪 Rời
+                    </button>
+                  </div>
+                </div>
+
                 {/* Opponent Info & Clock */}
                 <div className={`two-player-clock top ${onlineGame.getTurn() !== mySide ? 'active-turn' : ''}`}>
                   <div className="player-meta">
