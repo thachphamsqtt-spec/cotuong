@@ -8,7 +8,17 @@ import { toVietnameseNotation } from '../../core/vietnameseNotation';
 import { soundEffects } from '../../audio/soundFX';
 import { XiangqiBoard, PieceSet } from '../Board/XiangqiBoard';
 import { parseSquare } from '../../core/board';
-import { parseFEN } from '../../core/fen';
+import { parseFEN, INITIAL_FEN } from '../../core/fen';
+import {
+  saveActiveGame,
+  loadActiveGame,
+  clearActiveGame,
+  saveGameToHistory,
+  loadGameHistory,
+  StoredGameRecord,
+} from '../../play/gameStorage';
+import { exportToPGN } from '../../core/pgn';
+import { GameHistoryModal } from './GameHistoryModal';
 
 interface PlayViewProps {
   pieceSet: PieceSet;
@@ -48,14 +58,22 @@ export const PlayView: React.FC<PlayViewProps> = ({
     reason: string;
   } | null>(null);
 
-  const initialBoardRef = useRef<Board>(game.getBoard());
+  // History & Import Modal
+  const [historyModalOpen, setHistoryModalOpen] = useState<boolean>(false);
+  const [savedHistory, setSavedHistory] = useState<StoredGameRecord[]>(() => loadGameHistory());
 
+  const initialBoardRef = useRef<Board>(game.getBoard());
+  const initialFENRef = useRef<string>(customInitialFEN || INITIAL_FEN);
+  const [, setGameVersion] = useState<number>(0);
+
+  // Auto-restore active game if present on initial mount (and not overridden by customInitialFEN)
   useEffect(() => {
     if (customInitialFEN) {
       try {
         const newG = new XiangqiGame(customInitialFEN);
         setGame(newG);
         initialBoardRef.current = newG.getBoard();
+        initialFENRef.current = customInitialFEN;
         setPlayerSide(newG.getTurn());
         setMoveHistory([]);
         setSelectedSquare(null);
@@ -64,8 +82,58 @@ export const PlayView: React.FC<PlayViewProps> = ({
       } catch (err) {
         console.error('Failed to init game from custom FEN', err);
       }
+      return;
+    }
+
+    // Try loading persisted active game
+    const active = loadActiveGame();
+    if (active && active.moves && active.moves.length > 0) {
+      try {
+        const restoredGame = new XiangqiGame(active.initialFEN || INITIAL_FEN);
+        initialBoardRef.current = restoredGame.getBoard();
+        initialFENRef.current = active.initialFEN || INITIAL_FEN;
+
+        const restoredHistory: { notation: string; move: Move }[] = [];
+        for (const m of active.moves) {
+          const boardBefore = restoredGame.getBoard();
+          const res = restoredGame.makeMove(m.from, m.to);
+          if (res.success && res.move) {
+            const notation = toVietnameseNotation(boardBefore, res.move, notationFormat);
+            restoredHistory.push({ notation, move: res.move });
+          }
+        }
+
+        setGame(restoredGame);
+        setPlayerSide(active.playerSide || 'red');
+        const foundAi = AI_DIFFICULTIES.find((d) => d.level === active.aiLevel);
+        if (foundAi) setAiConfig(foundAi);
+        setTimeControl(active.timeControl || '10m');
+        setRedTime(active.redTime || 600);
+        setBlackTime(active.blackTime || 600);
+        setMoveHistory(restoredHistory);
+        setFeedbackMessage('⚡ Đã tự động khôi phục ván cờ dở dang của bạn.');
+      } catch (err) {
+        console.error('Failed to restore active game', err);
+      }
     }
   }, [customInitialFEN]);
+
+  // Auto-save active game whenever state updates
+  useEffect(() => {
+    if (moveHistory.length > 0 && !gameOverModal?.show) {
+      saveActiveGame({
+        initialFEN: initialFENRef.current,
+        moves: game.getHistory(),
+        moveNotations: moveHistory,
+        playerSide,
+        aiLevel: aiConfig.level,
+        timeControl,
+        redTime,
+        blackTime,
+        updatedAt: Date.now(),
+      });
+    }
+  }, [moveHistory, playerSide, aiConfig, timeControl, redTime, blackTime, gameOverModal?.show]);
 
   // Timer interval
   useEffect(() => {
@@ -151,9 +219,129 @@ export const PlayView: React.FC<PlayViewProps> = ({
   const handleGameOver = (title: string, reason: string) => {
     soundEffects.playVictory();
     setGameOverModal({ show: true, title, reason });
+
+    // Determine result
+    let result: 'win' | 'loss' | 'draw' = 'draw';
+    if (title.includes('Hòa')) {
+      result = 'draw';
+    } else if (reason.includes(playerSide === 'red' ? 'Đỏ thắng' : 'Đen thắng')) {
+      result = 'win';
+    } else {
+      result = 'loss';
+    }
+
+    // Save finished game to history library
+    const record: StoredGameRecord = {
+      id: `game_${Date.now()}`,
+      createdAt: Date.now(),
+      dateFormatted: new Date().toLocaleString('vi-VN'),
+      initialFEN: initialFENRef.current,
+      moves: game.getHistory(),
+      moveNotations: moveHistory,
+      playerSide,
+      aiLevel: aiConfig.level,
+      aiName: aiConfig.name,
+      timeControl,
+      result,
+      resultTitle: title,
+      resultReason: reason,
+      totalMoves: moveHistory.length,
+      finalFEN: game.getFEN(),
+    };
+
+    saveGameToHistory(record);
+    setSavedHistory(loadGameHistory());
+    clearActiveGame();
   };
 
-  const [, setGameVersion] = useState<number>(0);
+  const handleSaveCurrentGame = () => {
+    const record: StoredGameRecord = {
+      id: `saved_${Date.now()}`,
+      createdAt: Date.now(),
+      dateFormatted: new Date().toLocaleString('vi-VN'),
+      initialFEN: initialFENRef.current,
+      moves: game.getHistory(),
+      moveNotations: moveHistory,
+      playerSide,
+      aiLevel: aiConfig.level,
+      aiName: aiConfig.name,
+      timeControl,
+      result: 'in_progress',
+      resultTitle: 'Ván cờ lưu thủ công',
+      resultReason: `Đang ở nước thứ ${moveHistory.length}`,
+      totalMoves: moveHistory.length,
+      finalFEN: game.getFEN(),
+    };
+
+    saveGameToHistory(record);
+    setSavedHistory(loadGameHistory());
+    setFeedbackMessage('💾 Đã lưu ván cờ vào Lịch sử thành công!');
+    setTimeout(() => setFeedbackMessage(null), 3000);
+  };
+
+  const handleResumeFromHistory = (record: StoredGameRecord) => {
+    if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current);
+    isThinkingRef.current = false;
+    setIsThinking(false);
+
+    try {
+      const restoredGame = new XiangqiGame(record.initialFEN || INITIAL_FEN);
+      initialBoardRef.current = restoredGame.getBoard();
+      initialFENRef.current = record.initialFEN || INITIAL_FEN;
+
+      const restoredHistory: { notation: string; move: Move }[] = [];
+      for (const m of record.moves) {
+        const boardBefore = restoredGame.getBoard();
+        const res = restoredGame.makeMove(m.from, m.to);
+        if (res.success && res.move) {
+          const notation = toVietnameseNotation(boardBefore, res.move, notationFormat);
+          restoredHistory.push({ notation, move: res.move });
+        }
+      }
+
+      setGame(restoredGame);
+      setPlayerSide(record.playerSide || 'red');
+      const foundAi = AI_DIFFICULTIES.find((d) => d.level === record.aiLevel);
+      if (foundAi) setAiConfig(foundAi);
+      setMoveHistory(restoredHistory);
+      setSelectedSquare(null);
+      setGameOverModal(null);
+      setFeedbackMessage(`🔄 Đã mở lại ván cờ: ${record.dateFormatted}`);
+    } catch (err) {
+      console.error('Failed to resume game', err);
+    }
+  };
+
+  const handleImportGame = (fen: string, moves: Move[], title?: string) => {
+    if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current);
+    isThinkingRef.current = false;
+    setIsThinking(false);
+
+    try {
+      const newG = new XiangqiGame(fen || INITIAL_FEN);
+      initialBoardRef.current = newG.getBoard();
+      initialFENRef.current = fen || INITIAL_FEN;
+
+      const importedHistory: { notation: string; move: Move }[] = [];
+      for (const m of moves) {
+        const boardBefore = newG.getBoard();
+        const res = newG.makeMove(m.from, m.to);
+        if (res.success && res.move) {
+          const notation = toVietnameseNotation(boardBefore, res.move, notationFormat);
+          importedHistory.push({ notation, move: res.move });
+        }
+      }
+
+      setGame(newG);
+      setPlayerSide(newG.getTurn());
+      setMoveHistory(importedHistory);
+      setSelectedSquare(null);
+      setGameOverModal(null);
+      setFeedbackMessage(`📥 Đã nạp thành công ${title || 'ván cờ'}!`);
+    } catch (err) {
+      console.error('Failed to import game', err);
+    }
+  };
 
   const executeMove = (from: Square, to: Square) => {
     const boardBefore = game.getBoard();
@@ -233,7 +421,6 @@ export const PlayView: React.FC<PlayViewProps> = ({
   const handleOfferDraw = () => {
     if (isThinking || gameOverModal?.show) return;
     const score = evaluateBoard(game.getBoard());
-    // Score from red perspective: if machine is black, advantage is -score; if machine is red, advantage is +score
     const machineScore = playerSide === 'red' ? -score : score;
 
     if (machineScore > 80) {
@@ -253,9 +440,34 @@ export const PlayView: React.FC<PlayViewProps> = ({
     isThinkingRef.current = false;
     setIsThinking(false);
 
+    // Save previous game if had moves
+    if (moveHistory.length > 2 && !gameOverModal?.show) {
+      saveGameToHistory({
+        id: `abandoned_${Date.now()}`,
+        createdAt: Date.now(),
+        dateFormatted: new Date().toLocaleString('vi-VN'),
+        initialFEN: initialFENRef.current,
+        moves: game.getHistory(),
+        moveNotations: moveHistory,
+        playerSide,
+        aiLevel: aiConfig.level,
+        aiName: aiConfig.name,
+        timeControl,
+        result: 'in_progress',
+        resultTitle: 'Ván cờ chưa hoàn thành',
+        resultReason: 'Người chơi chuyển sang ván mới',
+        totalMoves: moveHistory.length,
+        finalFEN: game.getFEN(),
+      });
+      setSavedHistory(loadGameHistory());
+    }
+
+    clearActiveGame();
+
     const newG = new XiangqiGame();
     setGame(newG);
     initialBoardRef.current = newG.getBoard();
+    initialFENRef.current = INITIAL_FEN;
     setMoveHistory([]);
     setSelectedSquare(null);
     setGameOverModal(null);
@@ -274,6 +486,22 @@ export const PlayView: React.FC<PlayViewProps> = ({
 
     setRedTime(initialSeconds);
     setBlackTime(initialSeconds);
+  };
+
+  const handleQuickCopyPGN = () => {
+    const pgn = exportToPGN({
+      headers: {
+        Event: `Đấu AI (${aiConfig.name})`,
+        Date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+        Red: playerSide === 'red' ? 'Bạn' : `AI ${aiConfig.name}`,
+        Black: playerSide === 'black' ? 'Bạn' : `AI ${aiConfig.name}`,
+      },
+      moves: game.getHistory(),
+      initialFEN: initialFENRef.current,
+    });
+    navigator.clipboard.writeText(pgn);
+    setFeedbackMessage('📋 Đã sao chép biên bản PGN vào bộ nhớ tạm!');
+    setTimeout(() => setFeedbackMessage(null), 2500);
   };
 
   const formatClock = (seconds: number) => {
@@ -357,6 +585,27 @@ export const PlayView: React.FC<PlayViewProps> = ({
             <option value="15m10s">15 Phút + 10s</option>
           </select>
         </div>
+
+        <div className="play-topbar-history-actions">
+          <button
+            className="btn-secondary btn-sm"
+            onClick={() => {
+              setSavedHistory(loadGameHistory());
+              setHistoryModalOpen(true);
+            }}
+            title="Xem danh sách ván cờ đã lưu & Nhập/Xuất"
+          >
+            📚 Lịch sử ({savedHistory.length})
+          </button>
+          <button
+            className="btn-secondary btn-sm"
+            onClick={handleSaveCurrentGame}
+            disabled={moveHistory.length === 0}
+            title="Lưu ván cờ hiện tại vào lịch sử"
+          >
+            💾 Lưu ván
+          </button>
+        </div>
       </div>
 
       <div className="play-body">
@@ -425,7 +674,18 @@ export const PlayView: React.FC<PlayViewProps> = ({
 
             {/* Move history list */}
             <div className="move-history-container">
-              <h4>Biên bản ván cờ</h4>
+              <div className="move-history-header">
+                <h4>Biên bản ván cờ ({moveHistory.length} nước)</h4>
+                {moveHistory.length > 0 && (
+                  <button
+                    className="btn-tiny-link"
+                    onClick={handleQuickCopyPGN}
+                    title="Sao chép PGN"
+                  >
+                    📋 Copy PGN
+                  </button>
+                )}
+              </div>
               <div className="move-list-scroll">
                 {moveHistory.length === 0 ? (
                   <p className="empty-history-text">Chưa có nước cờ nào.</p>
@@ -508,6 +768,20 @@ export const PlayView: React.FC<PlayViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Game History & PGN/FEN Manager Modal */}
+      <GameHistoryModal
+        isOpen={historyModalOpen}
+        history={savedHistory}
+        onClose={() => setHistoryModalOpen(false)}
+        onResumeGame={handleResumeFromHistory}
+        onAnalyzeGame={(initialFEN, moves) => {
+          const g = new XiangqiGame(initialFEN);
+          onAnalyzeGame(g.getBoard(), moves);
+        }}
+        onImportGame={handleImportGame}
+        onRefreshHistory={() => setSavedHistory(loadGameHistory())}
+      />
     </div>
   );
 };
