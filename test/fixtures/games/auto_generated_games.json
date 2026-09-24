@@ -1,0 +1,3662 @@
+[
+  {
+    "id": "auto_game_01",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 24,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "h8",
+        "to": "h1"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "i10",
+        "to": "i9"
+      },
+      {
+        "from": "b10",
+        "to": "d10"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "d10",
+        "to": "d5"
+      },
+      {
+        "from": "a9",
+        "to": "d9"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "i9",
+        "to": "f9"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "d9",
+        "to": "d5"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "h10",
+        "to": "g8"
+      },
+      {
+        "from": "c8",
+        "to": "c9"
+      },
+      {
+        "from": "f9",
+        "to": "f1"
+      },
+      {
+        "from": "e1",
+        "to": "f1"
+      },
+      {
+        "from": "d5",
+        "to": "d1"
+      },
+      {
+        "from": "f1",
+        "to": "f2"
+      },
+      {
+        "from": "d1",
+        "to": "d2"
+      },
+      {
+        "from": "f2",
+        "to": "f1"
+      },
+      {
+        "from": "g8",
+        "to": "f6"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_02",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 28,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "h10",
+        "to": "f10"
+      },
+      {
+        "from": "e10",
+        "to": "f10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "i7",
+        "to": "i6"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "i6",
+        "to": "i5"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "i5",
+        "to": "i4"
+      },
+      {
+        "from": "h1",
+        "to": "h8"
+      },
+      {
+        "from": "h10",
+        "to": "h8"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "h8",
+        "to": "h4"
+      },
+      {
+        "from": "g3",
+        "to": "i4"
+      },
+      {
+        "from": "h4",
+        "to": "i4"
+      },
+      {
+        "from": "c3",
+        "to": "d5"
+      },
+      {
+        "from": "i4",
+        "to": "g4"
+      },
+      {
+        "from": "d5",
+        "to": "f6"
+      },
+      {
+        "from": "g4",
+        "to": "e4"
+      },
+      {
+        "from": "f6",
+        "to": "e4"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_03",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 32,
+    "result": "black_win",
+    "finalStatus": "checkmate",
+    "moves": [
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "b10",
+        "to": "c8"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "b8",
+        "to": "b1"
+      },
+      {
+        "from": "a1",
+        "to": "b1"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "b10",
+        "to": "b3"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "b3",
+        "to": "b1"
+      },
+      {
+        "from": "h1",
+        "to": "h8"
+      },
+      {
+        "from": "h10",
+        "to": "h8"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "h8",
+        "to": "h3"
+      },
+      {
+        "from": "a4",
+        "to": "a5"
+      },
+      {
+        "from": "b1",
+        "to": "b2"
+      },
+      {
+        "from": "e4",
+        "to": "e5"
+      },
+      {
+        "from": "h3",
+        "to": "g3"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "g3",
+        "to": "g4"
+      },
+      {
+        "from": "c8",
+        "to": "d8"
+      },
+      {
+        "from": "g4",
+        "to": "e4"
+      },
+      {
+        "from": "c1",
+        "to": "e3"
+      },
+      {
+        "from": "e4",
+        "to": "e5"
+      },
+      {
+        "from": "d8",
+        "to": "d9"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "d1",
+        "to": "e2"
+      },
+      {
+        "from": "e5",
+        "to": "e3"
+      },
+      {
+        "from": "a5",
+        "to": "a6"
+      },
+      {
+        "from": "b2",
+        "to": "b1"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_04",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 36,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "i10",
+        "to": "i9"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "h10",
+        "to": "f10"
+      },
+      {
+        "from": "e10",
+        "to": "f10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "g6",
+        "to": "g5"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "i9",
+        "to": "f9"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "f9",
+        "to": "f1"
+      },
+      {
+        "from": "e1",
+        "to": "e2"
+      },
+      {
+        "from": "f1",
+        "to": "g1"
+      },
+      {
+        "from": "c8",
+        "to": "b8"
+      },
+      {
+        "from": "g1",
+        "to": "h1"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "b10",
+        "to": "b8"
+      },
+      {
+        "from": "h1",
+        "to": "h8"
+      },
+      {
+        "from": "b8",
+        "to": "h8"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "h8",
+        "to": "h2"
+      },
+      {
+        "from": "e2",
+        "to": "e1"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      },
+      {
+        "from": "g6",
+        "to": "g7"
+      },
+      {
+        "from": "e6",
+        "to": "e5"
+      },
+      {
+        "from": "e4",
+        "to": "e5"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "g7",
+        "to": "g8"
+      },
+      {
+        "from": "a6",
+        "to": "a5"
+      },
+      {
+        "from": "a4",
+        "to": "a5"
+      },
+      {
+        "from": "d10",
+        "to": "e9"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_05",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 20,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "i10",
+        "to": "i9"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "h10",
+        "to": "f10"
+      },
+      {
+        "from": "e10",
+        "to": "f10"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "i9",
+        "to": "f9"
+      },
+      {
+        "from": "h1",
+        "to": "h8"
+      },
+      {
+        "from": "f9",
+        "to": "f1"
+      },
+      {
+        "from": "g3",
+        "to": "f1"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "h8",
+        "to": "b8"
+      },
+      {
+        "from": "b10",
+        "to": "b8"
+      },
+      {
+        "from": "f1",
+        "to": "e3"
+      },
+      {
+        "from": "b8",
+        "to": "b4"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "b4",
+        "to": "b1"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_06",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 24,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "b10",
+        "to": "d10"
+      },
+      {
+        "from": "e10",
+        "to": "d10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "a9",
+        "to": "d9"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "d9",
+        "to": "d4"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "d4",
+        "to": "a4"
+      },
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "a4",
+        "to": "a2"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "a2",
+        "to": "e2"
+      },
+      {
+        "from": "g3",
+        "to": "e2"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      },
+      {
+        "from": "c8",
+        "to": "b8"
+      },
+      {
+        "from": "i7",
+        "to": "i6"
+      },
+      {
+        "from": "e2",
+        "to": "d4"
+      },
+      {
+        "from": "e6",
+        "to": "e5"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_07",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 28,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "h10",
+        "to": "g8"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "c6",
+        "to": "c5"
+      },
+      {
+        "from": "h1",
+        "to": "h7"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "h7",
+        "to": "h8"
+      },
+      {
+        "from": "g6",
+        "to": "g5"
+      },
+      {
+        "from": "h8",
+        "to": "g8"
+      },
+      {
+        "from": "g5",
+        "to": "g4"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "g4",
+        "to": "g3"
+      },
+      {
+        "from": "g8",
+        "to": "b8"
+      },
+      {
+        "from": "c5",
+        "to": "c4"
+      },
+      {
+        "from": "b8",
+        "to": "b10"
+      },
+      {
+        "from": "a6",
+        "to": "a5"
+      },
+      {
+        "from": "b10",
+        "to": "c10"
+      },
+      {
+        "from": "a5",
+        "to": "b5"
+      },
+      {
+        "from": "c10",
+        "to": "c4"
+      },
+      {
+        "from": "g3",
+        "to": "f3"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_08",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 32,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "i10",
+        "to": "i9"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "h10",
+        "to": "f10"
+      },
+      {
+        "from": "e10",
+        "to": "f10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "g6",
+        "to": "g5"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "i9",
+        "to": "f9"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "f9",
+        "to": "f1"
+      },
+      {
+        "from": "e1",
+        "to": "e2"
+      },
+      {
+        "from": "f1",
+        "to": "g1"
+      },
+      {
+        "from": "c8",
+        "to": "b8"
+      },
+      {
+        "from": "g1",
+        "to": "h1"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "i7",
+        "to": "i6"
+      },
+      {
+        "from": "h1",
+        "to": "h8"
+      },
+      {
+        "from": "b10",
+        "to": "b8"
+      },
+      {
+        "from": "h8",
+        "to": "h9"
+      },
+      {
+        "from": "b8",
+        "to": "b1"
+      },
+      {
+        "from": "a1",
+        "to": "b1"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      },
+      {
+        "from": "b1",
+        "to": "b9"
+      },
+      {
+        "from": "e6",
+        "to": "e5"
+      },
+      {
+        "from": "e4",
+        "to": "e5"
+      },
+      {
+        "from": "i6",
+        "to": "i5"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_09",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 36,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "c6",
+        "to": "c5"
+      },
+      {
+        "from": "c3",
+        "to": "d5"
+      },
+      {
+        "from": "c5",
+        "to": "d5"
+      },
+      {
+        "from": "a1",
+        "to": "b1"
+      },
+      {
+        "from": "d5",
+        "to": "d4"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "d4",
+        "to": "e4"
+      },
+      {
+        "from": "b1",
+        "to": "b8"
+      },
+      {
+        "from": "b10",
+        "to": "b8"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "g6",
+        "to": "g5"
+      },
+      {
+        "from": "g3",
+        "to": "e4"
+      },
+      {
+        "from": "b8",
+        "to": "b2"
+      },
+      {
+        "from": "e4",
+        "to": "g5"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      },
+      {
+        "from": "g5",
+        "to": "e6"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "c10",
+        "to": "a8"
+      },
+      {
+        "from": "a4",
+        "to": "a5"
+      },
+      {
+        "from": "e10",
+        "to": "e9"
+      },
+      {
+        "from": "h1",
+        "to": "h8"
+      },
+      {
+        "from": "h10",
+        "to": "h8"
+      },
+      {
+        "from": "a5",
+        "to": "a6"
+      },
+      {
+        "from": "h8",
+        "to": "h2"
+      },
+      {
+        "from": "a6",
+        "to": "b6"
+      },
+      {
+        "from": "b2",
+        "to": "b6"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_10",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 20,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "i7",
+        "to": "i6"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "c3",
+        "to": "d5"
+      },
+      {
+        "from": "c6",
+        "to": "c5"
+      },
+      {
+        "from": "d5",
+        "to": "e7"
+      },
+      {
+        "from": "c5",
+        "to": "c4"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "e6",
+        "to": "e5"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_11",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 24,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "b8",
+        "to": "b1"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "b10",
+        "to": "c8"
+      },
+      {
+        "from": "i1",
+        "to": "i2"
+      },
+      {
+        "from": "h8",
+        "to": "h1"
+      },
+      {
+        "from": "i2",
+        "to": "f2"
+      },
+      {
+        "from": "b1",
+        "to": "d1"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "d1",
+        "to": "d5"
+      },
+      {
+        "from": "g6",
+        "to": "g7"
+      },
+      {
+        "from": "h1",
+        "to": "f1"
+      },
+      {
+        "from": "g7",
+        "to": "g8"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "f1",
+        "to": "c1"
+      },
+      {
+        "from": "f2",
+        "to": "f10"
+      },
+      {
+        "from": "e10",
+        "to": "e9"
+      },
+      {
+        "from": "f10",
+        "to": "d10"
+      },
+      {
+        "from": "c8",
+        "to": "d6"
+      },
+      {
+        "from": "d10",
+        "to": "c10"
+      },
+      {
+        "from": "c1",
+        "to": "c10"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_12",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 28,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "b10",
+        "to": "d10"
+      },
+      {
+        "from": "e10",
+        "to": "d10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "g6",
+        "to": "g5"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "a9",
+        "to": "d9"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "d9",
+        "to": "d1"
+      },
+      {
+        "from": "e1",
+        "to": "e2"
+      },
+      {
+        "from": "d1",
+        "to": "f1"
+      },
+      {
+        "from": "c8",
+        "to": "b8"
+      },
+      {
+        "from": "f1",
+        "to": "g1"
+      },
+      {
+        "from": "b8",
+        "to": "c8"
+      },
+      {
+        "from": "g1",
+        "to": "h1"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      },
+      {
+        "from": "c8",
+        "to": "c9"
+      },
+      {
+        "from": "c10",
+        "to": "e8"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "e6",
+        "to": "e5"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_13",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 32,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "i7",
+        "to": "i6"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "c6",
+        "to": "c5"
+      },
+      {
+        "from": "i1",
+        "to": "i2"
+      },
+      {
+        "from": "c5",
+        "to": "c4"
+      },
+      {
+        "from": "g6",
+        "to": "g7"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "g7",
+        "to": "g8"
+      },
+      {
+        "from": "c4",
+        "to": "c3"
+      },
+      {
+        "from": "g8",
+        "to": "h8"
+      },
+      {
+        "from": "a6",
+        "to": "a5"
+      },
+      {
+        "from": "h8",
+        "to": "g8"
+      },
+      {
+        "from": "h10",
+        "to": "h2"
+      },
+      {
+        "from": "i2",
+        "to": "h2"
+      },
+      {
+        "from": "a5",
+        "to": "a4"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "a4",
+        "to": "b4"
+      },
+      {
+        "from": "h2",
+        "to": "h9"
+      },
+      {
+        "from": "b4",
+        "to": "c4"
+      },
+      {
+        "from": "g8",
+        "to": "f8"
+      },
+      {
+        "from": "c4",
+        "to": "c3"
+      },
+      {
+        "from": "f8",
+        "to": "e8"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_14",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 36,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "h10",
+        "to": "g8"
+      },
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "h8",
+        "to": "h1"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "a2",
+        "to": "d2"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "d2",
+        "to": "d10"
+      },
+      {
+        "from": "e10",
+        "to": "d10"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "h10",
+        "to": "h3"
+      },
+      {
+        "from": "h1",
+        "to": "h3"
+      },
+      {
+        "from": "i7",
+        "to": "i6"
+      },
+      {
+        "from": "h3",
+        "to": "h9"
+      },
+      {
+        "from": "i6",
+        "to": "i5"
+      },
+      {
+        "from": "i4",
+        "to": "i5"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "g8",
+        "to": "f6"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "f6",
+        "to": "e4"
+      },
+      {
+        "from": "c8",
+        "to": "b8"
+      },
+      {
+        "from": "b10",
+        "to": "b8"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "b8",
+        "to": "b1"
+      },
+      {
+        "from": "i5",
+        "to": "i6"
+      },
+      {
+        "from": "b1",
+        "to": "b2"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      },
+      {
+        "from": "g6",
+        "to": "g7"
+      },
+      {
+        "from": "e6",
+        "to": "e5"
+      },
+      {
+        "from": "g7",
+        "to": "g8"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_15",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 20,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "i9"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "b8",
+        "to": "b1"
+      },
+      {
+        "from": "h10",
+        "to": "f10"
+      },
+      {
+        "from": "e10",
+        "to": "f10"
+      },
+      {
+        "from": "i1",
+        "to": "i2"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "b1",
+        "to": "d1"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "d1",
+        "to": "f1"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "f1",
+        "to": "f4"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "f4",
+        "to": "a4"
+      },
+      {
+        "from": "a2",
+        "to": "a4"
+      },
+      {
+        "from": "g6",
+        "to": "g5"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_16",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 24,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "g6",
+        "to": "g5"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "e6",
+        "to": "e5"
+      },
+      {
+        "from": "c8",
+        "to": "b8"
+      },
+      {
+        "from": "e5",
+        "to": "e4"
+      },
+      {
+        "from": "b8",
+        "to": "c8"
+      },
+      {
+        "from": "b10",
+        "to": "b1"
+      },
+      {
+        "from": "a1",
+        "to": "b1"
+      },
+      {
+        "from": "e4",
+        "to": "e3"
+      },
+      {
+        "from": "c1",
+        "to": "e3"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "c8",
+        "to": "d8"
+      },
+      {
+        "from": "a6",
+        "to": "a5"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_17",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 28,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "b8",
+        "to": "b1"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "h8",
+        "to": "h1"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "b1",
+        "to": "d1"
+      },
+      {
+        "from": "a2",
+        "to": "f2"
+      },
+      {
+        "from": "d1",
+        "to": "d5"
+      },
+      {
+        "from": "f2",
+        "to": "f10"
+      },
+      {
+        "from": "e10",
+        "to": "f10"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "h10",
+        "to": "g8"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "i10",
+        "to": "i9"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "b10",
+        "to": "c8"
+      },
+      {
+        "from": "c1",
+        "to": "e3"
+      },
+      {
+        "from": "c8",
+        "to": "d6"
+      },
+      {
+        "from": "e3",
+        "to": "g5"
+      },
+      {
+        "from": "g8",
+        "to": "f6"
+      },
+      {
+        "from": "e4",
+        "to": "e5"
+      },
+      {
+        "from": "g6",
+        "to": "g5"
+      },
+      {
+        "from": "e5",
+        "to": "e6"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_18",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 32,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "h8",
+        "to": "h1"
+      },
+      {
+        "from": "a1",
+        "to": "b1"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "h1",
+        "to": "f1"
+      },
+      {
+        "from": "b1",
+        "to": "b8"
+      },
+      {
+        "from": "f1",
+        "to": "i1"
+      },
+      {
+        "from": "e1",
+        "to": "e2"
+      },
+      {
+        "from": "i1",
+        "to": "d1"
+      },
+      {
+        "from": "b8",
+        "to": "b10"
+      },
+      {
+        "from": "d1",
+        "to": "d4"
+      },
+      {
+        "from": "b10",
+        "to": "c10"
+      },
+      {
+        "from": "d4",
+        "to": "g4"
+      },
+      {
+        "from": "c10",
+        "to": "d10"
+      },
+      {
+        "from": "e10",
+        "to": "d10"
+      },
+      {
+        "from": "c3",
+        "to": "b5"
+      },
+      {
+        "from": "g4",
+        "to": "a4"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "b5",
+        "to": "a7"
+      },
+      {
+        "from": "h10",
+        "to": "g8"
+      },
+      {
+        "from": "a7",
+        "to": "c6"
+      },
+      {
+        "from": "g8",
+        "to": "f6"
+      },
+      {
+        "from": "c6",
+        "to": "d8"
+      },
+      {
+        "from": "f6",
+        "to": "e4"
+      },
+      {
+        "from": "e2",
+        "to": "e1"
+      },
+      {
+        "from": "a4",
+        "to": "i4"
+      },
+      {
+        "from": "d8",
+        "to": "f7"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_19",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 36,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "b10",
+        "to": "d10"
+      },
+      {
+        "from": "e10",
+        "to": "d10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "h10",
+        "to": "g8"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "h8",
+        "to": "h1"
+      },
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "i1",
+        "to": "i2"
+      },
+      {
+        "from": "h1",
+        "to": "f1"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "f1",
+        "to": "d1"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "i2",
+        "to": "f2"
+      },
+      {
+        "from": "d1",
+        "to": "b1"
+      },
+      {
+        "from": "c1",
+        "to": "e3"
+      },
+      {
+        "from": "g8",
+        "to": "f6"
+      },
+      {
+        "from": "a2",
+        "to": "d2"
+      },
+      {
+        "from": "f6",
+        "to": "d5"
+      },
+      {
+        "from": "d2",
+        "to": "d5"
+      },
+      {
+        "from": "d10",
+        "to": "e10"
+      },
+      {
+        "from": "f2",
+        "to": "f9"
+      },
+      {
+        "from": "a9",
+        "to": "f9"
+      },
+      {
+        "from": "g6",
+        "to": "g7"
+      },
+      {
+        "from": "i10",
+        "to": "i9"
+      },
+      {
+        "from": "g7",
+        "to": "g8"
+      },
+      {
+        "from": "b1",
+        "to": "g1"
+      },
+      {
+        "from": "d5",
+        "to": "d7"
+      },
+      {
+        "from": "f9",
+        "to": "f4"
+      },
+      {
+        "from": "e3",
+        "to": "g1"
+      },
+      {
+        "from": "c6",
+        "to": "c5"
+      },
+      {
+        "from": "e4",
+        "to": "e5"
+      },
+      {
+        "from": "f4",
+        "to": "i4"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_20",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 20,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "h8",
+        "to": "h1"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "i10",
+        "to": "i9"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "h10",
+        "to": "g8"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "g8",
+        "to": "f6"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "f6",
+        "to": "e4"
+      },
+      {
+        "from": "c3",
+        "to": "e4"
+      },
+      {
+        "from": "c6",
+        "to": "c5"
+      },
+      {
+        "from": "e4",
+        "to": "c5"
+      },
+      {
+        "from": "i9",
+        "to": "d9"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_21",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 24,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "i10",
+        "to": "i9"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "h10",
+        "to": "f10"
+      },
+      {
+        "from": "e10",
+        "to": "f10"
+      },
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "c6",
+        "to": "c5"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "c5",
+        "to": "c4"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "c4",
+        "to": "c3"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "c3",
+        "to": "d3"
+      },
+      {
+        "from": "g3",
+        "to": "f5"
+      },
+      {
+        "from": "d3",
+        "to": "d2"
+      },
+      {
+        "from": "a2",
+        "to": "d2"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "d2",
+        "to": "d10"
+      },
+      {
+        "from": "f10",
+        "to": "f9"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_22",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 28,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "b8",
+        "to": "b1"
+      },
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "i1",
+        "to": "i2"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "b1",
+        "to": "d1"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "d1",
+        "to": "f1"
+      },
+      {
+        "from": "e1",
+        "to": "f1"
+      },
+      {
+        "from": "b10",
+        "to": "c8"
+      },
+      {
+        "from": "a2",
+        "to": "f2"
+      },
+      {
+        "from": "c8",
+        "to": "d6"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "d6",
+        "to": "e4"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "e4",
+        "to": "f2"
+      },
+      {
+        "from": "i2",
+        "to": "f2"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "f2",
+        "to": "f10"
+      },
+      {
+        "from": "e10",
+        "to": "e9"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "f10",
+        "to": "g10"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_23",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 32,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "b8",
+        "to": "b1"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "b1",
+        "to": "d1"
+      },
+      {
+        "from": "h1",
+        "to": "h8"
+      },
+      {
+        "from": "h10",
+        "to": "h8"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "d1",
+        "to": "d5"
+      },
+      {
+        "from": "g3",
+        "to": "f5"
+      },
+      {
+        "from": "h8",
+        "to": "h4"
+      },
+      {
+        "from": "f5",
+        "to": "h4"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "a2",
+        "to": "d2"
+      },
+      {
+        "from": "b10",
+        "to": "c8"
+      },
+      {
+        "from": "g6",
+        "to": "g7"
+      },
+      {
+        "from": "c6",
+        "to": "c5"
+      },
+      {
+        "from": "g7",
+        "to": "g8"
+      },
+      {
+        "from": "c5",
+        "to": "c4"
+      },
+      {
+        "from": "d2",
+        "to": "d5"
+      },
+      {
+        "from": "c8",
+        "to": "b6"
+      },
+      {
+        "from": "d5",
+        "to": "d10"
+      },
+      {
+        "from": "e10",
+        "to": "e9"
+      },
+      {
+        "from": "h4",
+        "to": "f5"
+      },
+      {
+        "from": "b6",
+        "to": "a4"
+      },
+      {
+        "from": "g8",
+        "to": "f8"
+      },
+      {
+        "from": "a4",
+        "to": "c5"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_24",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 36,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "b8",
+        "to": "b1"
+      },
+      {
+        "from": "a1",
+        "to": "b1"
+      },
+      {
+        "from": "h8",
+        "to": "h1"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "a4",
+        "to": "a5"
+      },
+      {
+        "from": "b10",
+        "to": "c8"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "c8",
+        "to": "d6"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "a5",
+        "to": "a6"
+      },
+      {
+        "from": "d6",
+        "to": "e4"
+      },
+      {
+        "from": "a6",
+        "to": "b6"
+      },
+      {
+        "from": "h10",
+        "to": "g8"
+      },
+      {
+        "from": "b6",
+        "to": "c6"
+      },
+      {
+        "from": "g8",
+        "to": "f6"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "h10",
+        "to": "h3"
+      },
+      {
+        "from": "h1",
+        "to": "h3"
+      },
+      {
+        "from": "f6",
+        "to": "g4"
+      },
+      {
+        "from": "c8",
+        "to": "d8"
+      },
+      {
+        "from": "g6",
+        "to": "g5"
+      },
+      {
+        "from": "d8",
+        "to": "d9"
+      },
+      {
+        "from": "a9",
+        "to": "d9"
+      },
+      {
+        "from": "h3",
+        "to": "h9"
+      },
+      {
+        "from": "d9",
+        "to": "h9"
+      },
+      {
+        "from": "i4",
+        "to": "i5"
+      },
+      {
+        "from": "g4",
+        "to": "i5"
+      },
+      {
+        "from": "b3",
+        "to": "h3"
+      },
+      {
+        "from": "i5",
+        "to": "h3"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_25",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 20,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "h8",
+        "to": "h1"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "h10",
+        "to": "g8"
+      },
+      {
+        "from": "a1",
+        "to": "b1"
+      },
+      {
+        "from": "c6",
+        "to": "c5"
+      },
+      {
+        "from": "b1",
+        "to": "b8"
+      },
+      {
+        "from": "b10",
+        "to": "b8"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "b8",
+        "to": "b2"
+      },
+      {
+        "from": "c3",
+        "to": "d5"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "d5",
+        "to": "e7"
+      },
+      {
+        "from": "h10",
+        "to": "h3"
+      },
+      {
+        "from": "e4",
+        "to": "e5"
+      },
+      {
+        "from": "h3",
+        "to": "h1"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_26",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 24,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "a1",
+        "to": "b1"
+      },
+      {
+        "from": "c6",
+        "to": "c5"
+      },
+      {
+        "from": "b1",
+        "to": "b8"
+      },
+      {
+        "from": "g6",
+        "to": "g5"
+      },
+      {
+        "from": "b8",
+        "to": "b10"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "c5",
+        "to": "c4"
+      },
+      {
+        "from": "h1",
+        "to": "h7"
+      },
+      {
+        "from": "g5",
+        "to": "g4"
+      },
+      {
+        "from": "h7",
+        "to": "i7"
+      },
+      {
+        "from": "c4",
+        "to": "c3"
+      },
+      {
+        "from": "b10",
+        "to": "c10"
+      },
+      {
+        "from": "g4",
+        "to": "f4"
+      },
+      {
+        "from": "c10",
+        "to": "d10"
+      },
+      {
+        "from": "e10",
+        "to": "d10"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_27",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 28,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "h8",
+        "to": "h1"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "h10",
+        "to": "g8"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "h10",
+        "to": "h3"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "h3",
+        "to": "h1"
+      },
+      {
+        "from": "a1",
+        "to": "b1"
+      },
+      {
+        "from": "h1",
+        "to": "g1"
+      },
+      {
+        "from": "b1",
+        "to": "b7"
+      },
+      {
+        "from": "g1",
+        "to": "f1"
+      },
+      {
+        "from": "e1",
+        "to": "f1"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "b7",
+        "to": "b8"
+      },
+      {
+        "from": "b10",
+        "to": "b8"
+      },
+      {
+        "from": "c3",
+        "to": "d5"
+      },
+      {
+        "from": "b8",
+        "to": "b2"
+      },
+      {
+        "from": "d5",
+        "to": "e7"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "e7",
+        "to": "c6"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "a4",
+        "to": "a5"
+      },
+      {
+        "from": "a6",
+        "to": "a5"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_28",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 32,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "b8",
+        "to": "b1"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "b1",
+        "to": "d1"
+      },
+      {
+        "from": "e1",
+        "to": "d1"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "c5",
+        "to": "c6"
+      },
+      {
+        "from": "b10",
+        "to": "c8"
+      },
+      {
+        "from": "c6",
+        "to": "c7"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "c7",
+        "to": "c8"
+      },
+      {
+        "from": "g6",
+        "to": "g5"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "a9",
+        "to": "d9"
+      },
+      {
+        "from": "c8",
+        "to": "d8"
+      },
+      {
+        "from": "d9",
+        "to": "d8"
+      },
+      {
+        "from": "a2",
+        "to": "d2"
+      },
+      {
+        "from": "d8",
+        "to": "d2"
+      },
+      {
+        "from": "d1",
+        "to": "d2"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "e6",
+        "to": "e5"
+      },
+      {
+        "from": "e4",
+        "to": "e5"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "g6",
+        "to": "g7"
+      },
+      {
+        "from": "d10",
+        "to": "e9"
+      },
+      {
+        "from": "g7",
+        "to": "g8"
+      },
+      {
+        "from": "a6",
+        "to": "a5"
+      },
+      {
+        "from": "g8",
+        "to": "h8"
+      },
+      {
+        "from": "h10",
+        "to": "h8"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_29",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 36,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "a1",
+        "to": "a2"
+      },
+      {
+        "from": "h10",
+        "to": "g8"
+      },
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "a9"
+      },
+      {
+        "from": "b10",
+        "to": "d10"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "d10",
+        "to": "f10"
+      },
+      {
+        "from": "e10",
+        "to": "f10"
+      },
+      {
+        "from": "c4",
+        "to": "c5"
+      },
+      {
+        "from": "h8",
+        "to": "h1"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "c6",
+        "to": "c5"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "c5",
+        "to": "c4"
+      },
+      {
+        "from": "g5",
+        "to": "g6"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "c4",
+        "to": "c3"
+      },
+      {
+        "from": "a2",
+        "to": "d2"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "d2",
+        "to": "d7"
+      },
+      {
+        "from": "h10",
+        "to": "h3"
+      },
+      {
+        "from": "h1",
+        "to": "h3"
+      },
+      {
+        "from": "g8",
+        "to": "f6"
+      },
+      {
+        "from": "h3",
+        "to": "c3"
+      },
+      {
+        "from": "f6",
+        "to": "d7"
+      },
+      {
+        "from": "c3",
+        "to": "c10"
+      },
+      {
+        "from": "f10",
+        "to": "f9"
+      },
+      {
+        "from": "c10",
+        "to": "g10"
+      },
+      {
+        "from": "d7",
+        "to": "c5"
+      },
+      {
+        "from": "g10",
+        "to": "g6"
+      },
+      {
+        "from": "c5",
+        "to": "e4"
+      },
+      {
+        "from": "g6",
+        "to": "e6"
+      },
+      {
+        "from": "e7",
+        "to": "e6"
+      },
+      {
+        "from": "a4",
+        "to": "a5"
+      },
+      {
+        "from": "e6",
+        "to": "e5"
+      }
+    ]
+  },
+  {
+    "id": "auto_game_30",
+    "source": "Tự sinh bởi AI dự án (Minimax + Alpha-Beta) - Dùng cho kiểm thử hồi quy luật cờ (Regression Test), không phải bằng chứng độc lập từ ván đấu thực tế ngoài đời",
+    "initialFen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+    "totalMoves": 20,
+    "result": "draw",
+    "finalStatus": "playing",
+    "moves": [
+      {
+        "from": "b3",
+        "to": "b10"
+      },
+      {
+        "from": "a10",
+        "to": "b10"
+      },
+      {
+        "from": "h3",
+        "to": "h10"
+      },
+      {
+        "from": "i10",
+        "to": "h10"
+      },
+      {
+        "from": "h1",
+        "to": "g3"
+      },
+      {
+        "from": "a7",
+        "to": "a6"
+      },
+      {
+        "from": "i1",
+        "to": "h1"
+      },
+      {
+        "from": "c7",
+        "to": "c6"
+      },
+      {
+        "from": "h1",
+        "to": "h8"
+      },
+      {
+        "from": "h10",
+        "to": "h8"
+      },
+      {
+        "from": "b1",
+        "to": "c3"
+      },
+      {
+        "from": "h8",
+        "to": "h5"
+      },
+      {
+        "from": "g4",
+        "to": "g5"
+      },
+      {
+        "from": "h5",
+        "to": "g5"
+      },
+      {
+        "from": "g3",
+        "to": "f5"
+      },
+      {
+        "from": "g5",
+        "to": "f5"
+      },
+      {
+        "from": "a1",
+        "to": "b1"
+      },
+      {
+        "from": "a6",
+        "to": "a5"
+      },
+      {
+        "from": "a4",
+        "to": "a5"
+      },
+      {
+        "from": "g7",
+        "to": "g6"
+      }
+    ]
+  }
+]
