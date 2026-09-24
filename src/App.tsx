@@ -3,12 +3,13 @@ import { LearnView } from './components/Learn/LearnView';
 import { PracticeView } from './components/Practice/PracticeView';
 import { PlayView } from './components/Play/PlayView';
 import { AnalysisView } from './components/Analysis/AnalysisView';
+import { EditorView } from './components/Editor/EditorView';
 import { PieceSet } from './components/Board/XiangqiBoard';
 import { Board, Move } from './core/types';
 import { soundEffects } from './audio/soundFX';
 import { parseFEN } from './core/fen';
 
-type ActiveTab = 'learn' | 'practice' | 'play' | 'analysis';
+type ActiveTab = 'learn' | 'practice' | 'play' | 'analysis' | 'editor';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('learn');
@@ -22,6 +23,9 @@ export default function App() {
   const [analysisInitialBoard, setAnalysisInitialBoard] = useState<Board>(() => parseFEN().board);
   const [analysisMoves, setAnalysisMoves] = useState<Move[]>([]);
 
+  // Custom play FEN from Editor
+  const [customPlayFEN, setCustomPlayFEN] = useState<string | undefined>(undefined);
+
   useEffect(() => {
     soundEffects.setEnabled(soundEnabled);
   }, [soundEnabled]);
@@ -34,6 +38,11 @@ export default function App() {
     setAnalysisInitialBoard(initialBoard);
     setAnalysisMoves(moves);
     setActiveTab('analysis');
+  };
+
+  const handlePlayFromEditor = (fen: string) => {
+    setCustomPlayFEN(fen);
+    setActiveTab('play');
   };
 
   return (
@@ -86,6 +95,15 @@ export default function App() {
             <span className="tab-icon">🔍</span>
             <span className="tab-text">Phân Tích</span>
           </button>
+          <button
+            className={`nav-tab-btn ${activeTab === 'editor' ? 'active' : ''}`}
+            onClick={() => setActiveTab('editor')}
+            role="tab"
+            aria-selected={activeTab === 'editor'}
+          >
+            <span className="tab-icon">♟️</span>
+            <span className="tab-text">Xếp Cờ</span>
+          </button>
         </nav>
 
         {/* Right Settings & Controls */}
@@ -122,6 +140,7 @@ export default function App() {
           <PlayView
             pieceSet={pieceSet}
             notationFormat={notationFormat}
+            customInitialFEN={customPlayFEN}
             onAnalyzeGame={handleStartAnalysis}
           />
         )}
@@ -131,6 +150,13 @@ export default function App() {
             moves={analysisMoves}
             pieceSet={pieceSet}
             onBackToPlay={() => setActiveTab('play')}
+          />
+        )}
+        {activeTab === 'editor' && (
+          <EditorView
+            pieceSet={pieceSet}
+            onPlayWithAI={handlePlayFromEditor}
+            onAnalyze={(board) => handleStartAnalysis(board, [])}
           />
         )}
       </main>

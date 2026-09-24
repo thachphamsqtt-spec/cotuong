@@ -8,20 +8,32 @@ import { toVietnameseNotation } from '../../core/vietnameseNotation';
 import { soundEffects } from '../../audio/soundFX';
 import { XiangqiBoard, PieceSet } from '../Board/XiangqiBoard';
 import { parseSquare } from '../../core/board';
+import { parseFEN } from '../../core/fen';
 
 interface PlayViewProps {
   pieceSet: PieceSet;
   notationFormat: 'short' | 'full';
+  customInitialFEN?: string;
   onAnalyzeGame: (initialBoard: Board, moves: Move[]) => void;
 }
 
 export const PlayView: React.FC<PlayViewProps> = ({
   pieceSet,
   notationFormat,
+  customInitialFEN,
   onAnalyzeGame,
 }) => {
-  const [game, setGame] = useState<XiangqiGame>(() => new XiangqiGame());
-  const [playerSide, setPlayerSide] = useState<Side>('red');
+  const [game, setGame] = useState<XiangqiGame>(() => new XiangqiGame(customInitialFEN));
+  const [playerSide, setPlayerSide] = useState<Side>(() => {
+    if (customInitialFEN) {
+      try {
+        return parseFEN(customInitialFEN).turn;
+      } catch {
+        return 'red';
+      }
+    }
+    return 'red';
+  });
   const [aiConfig, setAiConfig] = useState<AIDifficultyConfig>(AI_DIFFICULTIES[2]); // Default level 3
   const [timeControl, setTimeControl] = useState<'none' | '3m' | '5m' | '10m' | '15m10s'>('10m');
   const [redTime, setRedTime] = useState<number>(600);
@@ -37,6 +49,23 @@ export const PlayView: React.FC<PlayViewProps> = ({
   } | null>(null);
 
   const initialBoardRef = useRef<Board>(game.getBoard());
+
+  useEffect(() => {
+    if (customInitialFEN) {
+      try {
+        const newG = new XiangqiGame(customInitialFEN);
+        setGame(newG);
+        initialBoardRef.current = newG.getBoard();
+        setPlayerSide(newG.getTurn());
+        setMoveHistory([]);
+        setSelectedSquare(null);
+        setGameOverModal(null);
+        setFeedbackMessage('Đã bắt đầu ván cờ từ thế xếp tùy biến!');
+      } catch (err) {
+        console.error('Failed to init game from custom FEN', err);
+      }
+    }
+  }, [customInitialFEN]);
 
   // Timer interval
   useEffect(() => {
