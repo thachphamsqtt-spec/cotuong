@@ -4,6 +4,8 @@ import { Board, Move, Side, Square } from '../../core/types';
 import { AI_DIFFICULTIES, AIDifficultyConfig } from '../../ai/difficulty';
 import { searchBestMove } from '../../ai/search';
 import { evaluateBoard } from '../../ai/evaluation';
+import { buildAiCommentary, getEvaluationLabel, AIAnalysisResult } from '../../ai/analysis';
+import { generateCoachAdvice, CoachAdvice, CoachLevel } from '../../ai/coach';
 import { toVietnameseNotation } from '../../core/vietnameseNotation';
 import { soundEffects } from '../../audio/soundFX';
 import { XiangqiBoard, PieceSet } from '../Board/XiangqiBoard';
@@ -62,6 +64,24 @@ export const PlayView: React.FC<PlayViewProps> = ({
     title: string;
     reason: string;
   } | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysisResult>({
+    score: 0,
+    depth: aiConfig.depth,
+    bestMove: null,
+    explanation: 'Đang chờ phân tích...',
+    evaluationLabel: 'Thế cờ đang cân bằng',
+    topMoves: [],
+    predictedLines: [],
+  });
+  const [coachLevel, setCoachLevel] = useState<CoachLevel>('beginner');
+  const [coachAdvice, setCoachAdvice] = useState<CoachAdvice[]>([
+    {
+      title: 'AI Coach',
+      message: 'Chọn cấp độ để nhận lời khuyên phù hợp với năng lực của bạn.',
+      severity: 'info',
+    },
+  ]);
+  const [evalHistory, setEvalHistory] = useState<Array<{ move: number; score: number }>>([]);
 
   // Modals
   const [historyModalOpen, setHistoryModalOpen] = useState<boolean>(false);
@@ -227,6 +247,28 @@ export const PlayView: React.FC<PlayViewProps> = ({
     }
   }, [moveHistory.length, playerSide, aiConfig, gameOverModal?.show]);
 
+  const updateAnalysis = (board: Board, turn: Side) => {
+    const score = evaluateBoard(board);
+    const analysis = searchBestMove(board, turn, {
+      depth: aiConfig.depth,
+      timeLimitMs: aiConfig.timeLimitMs ?? 800,
+      iterativeDeepening: true,
+    });
+
+    const bestMove = analysis.bestMove;
+    const generatedAdvice = generateCoachAdvice(score, bestMove, turn, coachLevel);
+    setAiAnalysis({
+      score,
+      depth: analysis.depthReached,
+      bestMove,
+      explanation: buildAiCommentary(score, bestMove),
+      evaluationLabel: getEvaluationLabel(score, turn),
+      topMoves: bestMove ? [{ from: bestMove.from, to: bestMove.to, score, label: 'good' }] : [],
+      predictedLines: bestMove ? [[bestMove.from, bestMove.to]] : [],
+    });
+    setCoachAdvice(generatedAdvice);
+  };
+
   const handleGameOver = (title: string, reason: string) => {
     soundEffects.playVictory();
     setGameOverModal({ show: true, title, reason });
@@ -379,6 +421,11 @@ export const PlayView: React.FC<PlayViewProps> = ({
       setGameVersion((v) => v + 1);
       setSelectedSquare(null);
       setIllegalSquare(null);
+
+      const boardAfterMove = game.getBoard();
+      const boardScore = evaluateBoard(boardAfterMove);
+      setEvalHistory((prev) => [...prev, { move: prev.length + 1, score: boardScore }]);
+      updateAnalysis(boardAfterMove, game.getTurn());
     }
   };
 
@@ -615,10 +662,40 @@ export const PlayView: React.FC<PlayViewProps> = ({
     setTimeout(() => setFeedbackMessage(null), 2500);
   };
 
+  useEffect(() => {
+    updateAnalysis(game.getBoard(), game.getTurn());
+  }, [game, aiConfig.depth, aiConfig.timeLimitMs, coachLevel]);
+
   const formatClock = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const renderEvalChart = () => {
+    if (evalHistory.length === 0) {
+      return (
+        <div className="analysis-chart-empty">
+          <span>Chưa có số liệu thế cờ.</span>
+        </div>
+      );
+    }
+
+    const min = Math.min(...evalHistory.map((item) => item.score));
+    const max = Math.max(...evalHistory.map((item) => item.score));
+    const range = max - min || 1;
+
+    return (
+      <svg viewBox="0 0 280 120" className="analysis-chart-svg" aria-label="Biểu đồ vị thế cờ">
+        <line x1="10" y1="100" x2="270" y2="100" stroke="rgba(255,255,255,0.2)" />
+        <line x1="10" y1="10" x2="10" y2="100" stroke="rgba(255,255,255,0.2)" />
+        {evalHistory.map((point, index) => {
+          const x = 10 + (index / Math.max(evalHistory.length - 1, 1)) * 250;
+          const y = 100 - ((point.score - min) / range) * 80;
+          return <circle key={`${point.move}-${index}`} cx={x} cy={y} r="3" fill="#d4af37" />;
+        })}
+      </svg>
+    );
   };
 
   const legalMoves = selectedSquare ? game.getMovesForPiece(selectedSquare) : [];
@@ -814,6 +891,73 @@ export const PlayView: React.FC<PlayViewProps> = ({
                 {feedbackMessage.text}
               </div>
             )}
+
+            <div className="analysis-panel">
+              <div className="analysis-panel-header">
+                <h4>🤖 Phân tích AI</h4>
+                <span className="analysis-level-badge">Sâu {aiAnalysis.depth}</span>
+              </div>
+
+              <div className="analysis-panel-metrics">
+                <div>
+                  <span>Điểm thế</span>
+                  <strong>{aiAnalysis.score}</strong>
+                </div>
+                <div>
+                  <span>Đánh giá</span>
+                  <strong>{aiAnalysis.evaluationLabel}</strong>
+                </div>
+              </div>
+
+              <div className="analysis-chart-box">
+                {renderEvalChart()}
+              </div>
+
+              {aiAnalysis.bestMove && (
+                <div className="analysis-best-move">
+                  <span className="label">Nước mạnh nhất</span>
+                  <strong>
+                    {aiAnalysis.bestMove.from} → {aiAnalysis.bestMove.to}
+                  </strong>
+                </div>
+              )}
+
+              <div className="coach-level-picker">
+                <label htmlFor="coach-level">AI Coach:</label>
+                <select
+                  id="coach-level"
+                  value={coachLevel}
+                  onChange={(e) => setCoachLevel(e.target.value as CoachLevel)}
+                >
+                  <option value="beginner">Người mới</option>
+                  <option value="intermediate">Sơ cấp</option>
+                  <option value="advanced">Trung cấp</option>
+                  <option value="expert">Nâng cao</option>
+                </select>
+              </div>
+
+              <div className="coach-advice-box">
+                {coachAdvice.map((item, index) => (
+                  <div key={index} className={`coach-advice ${item.severity}`}>
+                    <strong>{item.title}</strong>
+                    <p>{item.message}</p>
+                  </div>
+                ))}
+              </div>
+
+              <p className="analysis-explanation">{aiAnalysis.explanation}</p>
+
+              {aiAnalysis.predictedLines.length > 0 && (
+                <div className="analysis-line-box">
+                  <span className="label">Dự đoán 3 nước</span>
+                  {aiAnalysis.predictedLines.slice(0, 3).map((line, index) => (
+                    <div key={index} className="analysis-prediction-line">
+                      {line.join(' → ')}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Move history list */}
             <div className="move-history-container">

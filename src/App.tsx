@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LearnView } from './components/Learn/LearnView';
 import { PracticeView } from './components/Practice/PracticeView';
 import { PlayView } from './components/Play/PlayView';
+import { TwoPlayerView } from './components/TwoPlayer/TwoPlayerView';
 import { AnalysisView } from './components/Analysis/AnalysisView';
 import { EditorView } from './components/Editor/EditorView';
 import { InstallPwaBanner } from './components/PWA/InstallPwaBanner';
@@ -10,7 +11,7 @@ import { Board, Move } from './core/types';
 import { soundEffects } from './audio/soundFX';
 import { parseFEN } from './core/fen';
 
-type ActiveTab = 'learn' | 'practice' | 'play' | 'analysis' | 'editor';
+type ActiveTab = 'learn' | 'practice' | 'play' | 'two-player' | 'analysis' | 'editor';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('learn');
@@ -26,6 +27,14 @@ export default function App() {
 
   // Custom play FEN from Editor
   const [customPlayFEN, setCustomPlayFEN] = useState<string | undefined>(undefined);
+
+  // Auto-switch to Two Player tab if a room link is opened
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('room')) {
+      setActiveTab('two-player');
+    }
+  }, []);
 
   useEffect(() => {
     soundEffects.setEnabled(soundEnabled);
@@ -88,6 +97,15 @@ export default function App() {
             <span className="tab-text">Đấu Máy</span>
           </button>
           <button
+            className={`nav-tab-btn ${activeTab === 'two-player' ? 'active' : ''}`}
+            onClick={() => setActiveTab('two-player')}
+            role="tab"
+            aria-selected={activeTab === 'two-player'}
+          >
+            <span className="tab-icon">👥</span>
+            <span className="tab-text">Đấu 2 Người</span>
+          </button>
+          <button
             className={`nav-tab-btn ${activeTab === 'analysis' ? 'active' : ''}`}
             onClick={() => setActiveTab('analysis')}
             role="tab"
@@ -148,6 +166,13 @@ export default function App() {
             onAnalyzeGame={handleStartAnalysis}
           />
         )}
+        {activeTab === 'two-player' && (
+          <TwoPlayerView
+            pieceSet={pieceSet}
+            notationFormat={notationFormat}
+            onAnalyzeGame={handleStartAnalysis}
+          />
+        )}
         {activeTab === 'analysis' && (
           <AnalysisView
             initialBoard={analysisInitialBoard}
@@ -193,6 +218,15 @@ export default function App() {
         >
           <span className="mobile-tab-icon">⚔️</span>
           <span className="mobile-tab-text">Đấu Máy</span>
+        </button>
+        <button
+          className={`mobile-tab-btn ${activeTab === 'two-player' ? 'active' : ''}`}
+          onClick={() => setActiveTab('two-player')}
+          role="tab"
+          aria-selected={activeTab === 'two-player'}
+        >
+          <span className="mobile-tab-icon">👥</span>
+          <span className="mobile-tab-text">2 Người</span>
         </button>
         <button
           className={`mobile-tab-btn ${activeTab === 'analysis' ? 'active' : ''}`}
