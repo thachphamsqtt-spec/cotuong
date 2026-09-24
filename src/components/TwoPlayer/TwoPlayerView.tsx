@@ -297,12 +297,20 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
   // ==========================================
   const setupP2PCallbacks = () => {
     return {
-      onPeerReady: (code: string) => {
+      onRoomCreated: (code: string) => {
         setMyRoomCode(code);
         setCurrentOnlineRoomCode(code);
         setIsHosting(true);
+        setIsGuestJoined(false);
         setIsConnecting(false);
         setOnlineStatusMessage(`Đã tạo phòng [${code}]! Hãy gửi link hoặc mã phòng cho bạn bè.`);
+      },
+      onRoomJoined: (code: string) => {
+        setCurrentOnlineRoomCode(code);
+        setIsGuestJoined(true);
+        setIsHosting(false);
+        setIsConnecting(false);
+        setOnlineStatusMessage(`Đã kết nối tới phòng [${code}]! Đang chờ chủ phòng bắt đầu ván đấu...`);
       },
       onConnected: (peerName: string) => {
         setOpponentName(peerName || 'Kỳ Thủ');
@@ -314,6 +322,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
         setRoomHostName(info.hostName);
         setOpponentName(info.hostName);
         setIsGuestJoined(true);
+        setIsHosting(false);
         setIsConnecting(false);
         setOnlineStatusMessage(`🟢 Đã vào phòng [${info.roomCode}] của [${info.hostName}]!`);
       },
@@ -445,7 +454,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     setIsConnecting(true);
     setOnlineStatusMessage('Đang khởi tạo máy chủ phòng...');
     try {
-      await p2pService.init(playerName, setupP2PCallbacks());
+      await p2pService.createRoom(playerName, setupP2PCallbacks());
     } catch (e: any) {
       setOnlineStatusMessage('Không thể tạo phòng, vui lòng thử lại.');
       setIsConnecting(false);
@@ -468,9 +477,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     setOnlineStatusMessage(`Đang tìm và kết nối tới phòng [${clean}]...`);
 
     try {
-      await p2pService.init(playerName, setupP2PCallbacks());
-      await p2pService.joinRoom(clean, playerName);
-      setOnlineStatusMessage(`Đã kết nối tới phòng [${clean}]! Đang chờ thông tin từ chủ phòng...`);
+      await p2pService.joinRoom(clean, playerName, setupP2PCallbacks());
     } catch (e: any) {
       setOnlineStatusMessage(`Không thể kết nối vào phòng [${clean}]. Vui lòng kiểm tra lại mã.`);
       setIsConnecting(false);
