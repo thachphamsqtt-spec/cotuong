@@ -13,6 +13,13 @@ interface LearnViewProps {
   pieceSet: PieceSet;
 }
 
+const LEVEL_NAMES: Record<number, { title: string; short: string; subtitle: string }> = {
+  1: { title: 'Cấp 1: Nhập môn', short: 'Cấp 1', subtitle: 'Bàn cờ & Luật di chuyển các quân' },
+  2: { title: 'Cấp 2: Khai cuộc', short: 'Cấp 2', subtitle: 'Nguyên lý & Trận thế khai cuộc chuẩn' },
+  3: { title: 'Cấp 3: Sát pháp', short: 'Cấp 3', subtitle: 'Chiến thuật chiếu bí & Đòn phối hợp' },
+  4: { title: 'Cấp 4: Tàn cuộc', short: 'Cấp 4', subtitle: 'Cờ tàn căn bản & Kỹ thuật định thắng' },
+};
+
 export const LearnView: React.FC<LearnViewProps> = ({ pieceSet }) => {
   const [progress, setProgress] = useState<UserProgress>(loadUserProgress());
   const [selectedLesson, setSelectedLesson] = useState<Lesson>(CURRICULUM[0]);
@@ -25,6 +32,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ pieceSet }) => {
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
   const [showSolution, setShowSolution] = useState<boolean>(false);
   const [exploreMode, setExploreMode] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
   const currentStep: LessonStep = selectedLesson.steps[stepIndex];
 
@@ -50,6 +58,21 @@ export const LearnView: React.FC<LearnViewProps> = ({ pieceSet }) => {
     setSelectedLesson(lesson);
     setSelectedLevelTab(lesson.level);
     setStepIndex(0);
+    setIsDropdownOpen(false);
+  };
+
+  const handlePrevLesson = () => {
+    const currentIndex = CURRICULUM.findIndex((l) => l.id === selectedLesson.id);
+    if (currentIndex > 0) {
+      handleLessonSelect(CURRICULUM[currentIndex - 1]);
+    }
+  };
+
+  const handleNextLesson = () => {
+    const currentIndex = CURRICULUM.findIndex((l) => l.id === selectedLesson.id);
+    if (currentIndex < CURRICULUM.length - 1) {
+      handleLessonSelect(CURRICULUM[currentIndex + 1]);
+    }
   };
 
   const handleResetStep = () => {
@@ -124,43 +147,31 @@ export const LearnView: React.FC<LearnViewProps> = ({ pieceSet }) => {
       soundEffects.playVictory();
       setFeedback({
         type: 'success',
-        message: 'Chính xác! Bạn đã hoàn thành tốt bài thực hành này.',
+        message: 'Xuất sắc! Bạn đã thực hiện chính xác nước cờ yêu cầu.',
       });
-
-      // Mark lesson completed if it's the last step
-      if (stepIndex === selectedLesson.steps.length - 1) {
-        const updated = markLessonCompleted(selectedLesson.id, selectedLesson.level);
-        setProgress(updated);
-      }
     } else {
-      soundEffects.playDefeat();
-      const moveKey = `${from}${to}`;
-      const wrongMsg = tryStep.wrongMoves?.[moveKey] || 'Nước đi chưa đúng mục tiêu của bài học. Hãy thử lại!';
+      setSelectedSquare(null);
+      soundEffects.playError();
       setFeedback({
         type: 'error',
-        message: wrongMsg,
+        message: 'Nước đi chưa chính xác, hãy xem lại gợi ý và thử lại nhé!',
       });
-      setSelectedSquare(null);
     }
   };
 
-  const handleQuizChoice = (idx: number, q: QuizStep['questions'][0]) => {
-    setQuizAnswer(idx);
-    if (idx === q.correctIndex) {
+  const handleQuizChoice = (optionIndex: number, question: any) => {
+    setQuizAnswer(optionIndex);
+    if (optionIndex === question.correctIndex) {
       soundEffects.playVictory();
       setFeedback({
         type: 'success',
-        message: `Chính xác! ${q.explanation}`,
+        message: `Chính xác! ${question.explanation || ''}`,
       });
-      if (stepIndex === selectedLesson.steps.length - 1) {
-        const updated = markLessonCompleted(selectedLesson.id, selectedLesson.level);
-        setProgress(updated);
-      }
     } else {
-      soundEffects.playDefeat();
+      soundEffects.playError();
       setFeedback({
         type: 'error',
-        message: `Chưa đúng. ${q.explanation}`,
+        message: `Chưa đúng. ${question.explanation || 'Hãy thử chọn lại phương án khác nhé!'}`,
       });
     }
   };
@@ -169,13 +180,14 @@ export const LearnView: React.FC<LearnViewProps> = ({ pieceSet }) => {
     if (stepIndex < selectedLesson.steps.length - 1) {
       setStepIndex((prev) => prev + 1);
     } else {
-      // Move to next lesson if available
-      const currentIdx = CURRICULUM.findIndex((l) => l.id === selectedLesson.id);
-      if (currentIdx < CURRICULUM.length - 1) {
-        setSelectedLesson(CURRICULUM[currentIdx + 1]);
-        setSelectedLevelTab(CURRICULUM[currentIdx + 1].level);
-        setStepIndex(0);
-      }
+      // Completed lesson
+      soundEffects.playVictory();
+      const updated = markLessonCompleted(selectedLesson.id, selectedLesson.level);
+      setProgress(updated);
+      setFeedback({
+        type: 'success',
+        message: `Chúc mừng! Bạn đã hoàn thành xuất sắc bài học: "${selectedLesson.title}"!`,
+      });
     }
   };
 
@@ -196,9 +208,112 @@ export const LearnView: React.FC<LearnViewProps> = ({ pieceSet }) => {
     }
   }
 
+  const currentLevelLessons = CURRICULUM.filter((l) => l.level === selectedLevelTab);
+  const currentLevelDoneCount = currentLevelLessons.filter((l) => progress.completedLessons.includes(l.id)).length;
+  const currentLessonIndex = CURRICULUM.findIndex((l) => l.id === selectedLesson.id);
+
   return (
     <div className="learn-container">
-      {/* Sidebar: Curriculum List */}
+      {/* Mobile & Responsive Dropdown Curriculum Toolbar */}
+      <div className="learn-mobile-curriculum-bar">
+        {/* Level Tabs (Cấp 1, Cấp 2, Cấp 3, Cấp 4) */}
+        <div className="learn-level-pills-row">
+          {[1, 2, 3, 4].map((lvl) => {
+            const lvlLessons = CURRICULUM.filter((l) => l.level === lvl);
+            const lvlDone = lvlLessons.filter((l) => progress.completedLessons.includes(l.id)).length;
+            const isLvlActive = selectedLevelTab === lvl;
+
+            return (
+              <button
+                key={`lvl-pill-${lvl}`}
+                className={`learn-level-pill ${isLvlActive ? 'active' : ''}`}
+                onClick={() => {
+                  setSelectedLevelTab(lvl);
+                  setIsDropdownOpen(true);
+                }}
+              >
+                <span className="lvl-name">{LEVEL_NAMES[lvl]?.short || `Cấp ${lvl}`}</span>
+                <span className="lvl-badge">
+                  {lvlDone}/{lvlLessons.length}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Current Lesson Bar & Dropdown Button */}
+        <div className="learn-dropdown-trigger-row">
+          <button
+            className="btn-prev-next-nav"
+            onClick={handlePrevLesson}
+            disabled={currentLessonIndex <= 0}
+            title="Bài học trước"
+          >
+            ◀
+          </button>
+
+          <button
+            className={`learn-dropdown-toggle-btn ${isDropdownOpen ? 'open' : ''}`}
+            onClick={() => setIsDropdownOpen((prev) => !prev)}
+            aria-expanded={isDropdownOpen}
+          >
+            <div className="dropdown-label-group">
+              <span className="dropdown-level-tag">{LEVEL_NAMES[selectedLesson.level]?.short}:</span>
+              <strong className="dropdown-lesson-title">{selectedLesson.title}</strong>
+            </div>
+            <span className="dropdown-arrow-icon">{isDropdownOpen ? '▲' : '▼'}</span>
+          </button>
+
+          <button
+            className="btn-prev-next-nav"
+            onClick={handleNextLesson}
+            disabled={currentLessonIndex >= CURRICULUM.length - 1}
+            title="Bài học tiếp theo"
+          >
+            ▶
+          </button>
+        </div>
+
+        {/* Collapsible Dropdown List */}
+        {isDropdownOpen && (
+          <div className="learn-dropdown-menu-list">
+            <div className="dropdown-menu-header">
+              <span>{LEVEL_NAMES[selectedLevelTab]?.title} ({currentLevelDoneCount}/{currentLevelLessons.length} bài)</span>
+              <button className="btn-close-dropdown" onClick={() => setIsDropdownOpen(false)}>
+                ✕ Đóng
+              </button>
+            </div>
+
+            <div className="dropdown-items-scroll">
+              {currentLevelLessons.map((lesson, idx) => {
+                const isDone = progress.completedLessons.includes(lesson.id);
+                const isSelected = selectedLesson.id === lesson.id;
+
+                return (
+                  <button
+                    key={`drop-item-${lesson.id}`}
+                    className={`dropdown-lesson-item ${isSelected ? 'active' : ''} ${isDone ? 'done' : ''}`}
+                    onClick={() => handleLessonSelect(lesson)}
+                  >
+                    <span className="dropdown-item-num">{idx + 1}.</span>
+                    <div className="dropdown-item-info">
+                      <strong className="dropdown-item-title">{lesson.title}</strong>
+                      <span className="dropdown-item-sub">{lesson.summary}</span>
+                    </div>
+                    {isDone ? (
+                      <span className="dropdown-status-icon done" title="Đã hoàn thành">✓</span>
+                    ) : (
+                      <span className="dropdown-status-icon todo" title="Chưa học">•</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Sidebar: Curriculum List (Visible on >= 1024px) */}
       <aside className="curriculum-sidebar">
         <div className="sidebar-header">
           <h3>Giáo Trình Cờ Tướng</h3>
@@ -218,26 +333,21 @@ export const LearnView: React.FC<LearnViewProps> = ({ pieceSet }) => {
 
         {/* Level Tabs */}
         <div className="level-tabs-header">
-          {Array.from(new Set(CURRICULUM.map((l) => l.level)))
-            .sort((a, b) => a - b)
-            .map((lvl) => {
-              const levelShortNames: Record<number, string> = {
-                1: 'Nhập môn',
-                2: 'Khai cuộc',
-                3: 'Sát pháp',
-                4: 'Tàn cuộc',
-              };
-              return (
-                <button
-                  key={`tab-${lvl}`}
-                  className={`level-tab-btn ${selectedLevelTab === lvl ? 'active' : ''}`}
-                  onClick={() => setSelectedLevelTab(lvl)}
-                  title={levelShortNames[lvl] || `Cấp ${lvl}`}
-                >
-                  {levelShortNames[lvl] ? `C.${lvl}: ${levelShortNames[lvl]}` : `Cấp ${lvl}`}
-                </button>
-              );
-            })}
+          {[1, 2, 3, 4].map((lvl) => {
+            const lvlLessons = CURRICULUM.filter((l) => l.level === lvl);
+            const lvlDone = lvlLessons.filter((l) => progress.completedLessons.includes(l.id)).length;
+            return (
+              <button
+                key={`tab-${lvl}`}
+                className={`level-tab-btn ${selectedLevelTab === lvl ? 'active' : ''}`}
+                onClick={() => setSelectedLevelTab(lvl)}
+                title={LEVEL_NAMES[lvl]?.title}
+              >
+                <span>{LEVEL_NAMES[lvl]?.short}</span>
+                <span className="tab-progress-tiny">{lvlDone}/{lvlLessons.length}</span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="lesson-levels-list">
