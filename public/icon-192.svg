@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <radialGradient id="bgDisc192" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#fff5e0" />
+      <stop offset="60%" stop-color="#ebd09e" />
+      <stop offset="100%" stop-color="#c69550" />
+    </radialGradient>
+    <linearGradient id="goldRing192" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fae29c" />
+      <stop offset="50%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#8a6913" />
+    </linearGradient>
+  </defs>
+
+  <rect width="192" height="192" rx="40" fill="#12100e" />
+  <circle cx="96" cy="96" r="82" fill="url(#goldRing192)" />
+  <circle cx="96" cy="96" r="76" fill="url(#bgDisc192)" stroke="#74451c" stroke-width="2" />
+  <circle cx="96" cy="96" r="62" fill="none" stroke="#c0392b" stroke-width="2" />
+
+  <text 
+    x="96" 
+    y="105" 
+    font-family="'Noto Serif SC', 'KaiTi', serif" 
+    font-size="86" 
+    font-weight="900" 
+    fill="#c0392b" 
+    text-anchor="middle" 
+    dominant-baseline="middle"
+  >帥</text>
+</svg>

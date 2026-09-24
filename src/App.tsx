@@ -4,6 +4,7 @@ import { PracticeView } from './components/Practice/PracticeView';
 import { PlayView } from './components/Play/PlayView';
 import { AnalysisView } from './components/Analysis/AnalysisView';
 import { EditorView } from './components/Editor/EditorView';
+import { InstallPwaBanner } from './components/PWA/InstallPwaBanner';
 import { PieceSet } from './components/Board/XiangqiBoard';
 import { Board, Move } from './core/types';
 import { soundEffects } from './audio/soundFX';
@@ -132,6 +133,9 @@ export default function App() {
         </div>
       </header>
 
+      {/* PWA Install Banner */}
+      <InstallPwaBanner />
+
       {/* Main View Area */}
       <main className="main-content-area">
         {activeTab === 'learn' && <LearnView pieceSet={pieceSet} />}
@@ -244,6 +248,24 @@ export default function App() {
                   />
                   <span className="slider round"></span>
                 </label>
+              </div>
+
+              {/* PWA & Offline Support Info */}
+              <div className="setting-group">
+                <label className="setting-label">📲 Cài đặt App & Ngoại tuyến (PWA):</label>
+                <div className="pwa-settings-box">
+                  <div className="pwa-status-badge offline-ready">
+                    <span className="pwa-status-dot"></span>
+                    <span>Hỗ trợ chơi Offline 100% không cần mạng</span>
+                  </div>
+                  <div className="pwa-ios-instructions">
+                    💡 <strong>Mẹo cài đặt:</strong>
+                    <br />
+                    • <strong>Android / Chrome:</strong> Chọn biểu tượng cài đặt trên thanh địa chỉ hoặc nhấn banner xuất hiện trên đầu trang.
+                    <br />
+                    • <strong>iPhone / Safari:</strong> Nhấn biểu tượng Chia sẻ (Share) 📤 rồi chọn <strong>"Thêm vào Màn hình chính" (Add to Home Screen)</strong>.
+                  </div>
+                </div>
               </div>
             </div>
 

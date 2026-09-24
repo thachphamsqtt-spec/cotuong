@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgDisc" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#fff5e0" />
+      <stop offset="60%" stop-color="#ebd09e" />
+      <stop offset="100%" stop-color="#c69550" />
+    </radialGradient>
+    <radialGradient id="outerBevel" cx="30%" cy="25%" r="75%">
+      <stop offset="0%" stop-color="#9a652f" />
+      <stop offset="100%" stop-color="#3d210b" />
+    </radialGradient>
+    <linearGradient id="goldRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fae29c" />
+      <stop offset="50%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#8a6913" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+  </defs>
+
+  <!-- Dark Background Container -->
+  <rect width="512" height="512" rx="100" fill="#12100e" />
+
+  <!-- Piece Drop Shadow & Outer Rim -->
+  <circle cx="256" cy="256" r="216" fill="url(#outerBevel)" filter="url(#shadow)" />
+  <circle cx="256" cy="256" r="210" fill="url(#goldRing)" />
+  
+  <!-- Piece Wooden Disc -->
+  <circle cx="256" cy="256" r="195" fill="url(#bgDisc)" stroke="#74451c" stroke-width="4" />
+  
+  <!-- Inner Decorative Red Ring -->
+  <circle cx="256" cy="256" r="165" fill="none" stroke="#c0392b" stroke-width="5" stroke-dasharray="8 4" />
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#c0392b" stroke-width="3" />
+
+  <!-- Authentic Red General Character (帥) -->
+  <text 
+    x="256" 
+    y="278" 
+    font-family="'Noto Serif SC', 'KaiTi', 'SimSun', serif" 
+    font-size="210" 
+    font-weight="900" 
+    fill="#c0392b" 
+    text-anchor="middle" 
+    dominant-baseline="middle"
+  >帥</text>
+</svg>
