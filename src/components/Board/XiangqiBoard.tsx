@@ -14,6 +14,8 @@ interface XiangqiBoardProps {
   legalMoves?: Move[];
   lastMove?: Move;
   checkSquare?: Square | null; // Square of General currently in check
+  illegalSquare?: Square | null; // Square of illegal attempt (triggers shake animation)
+  isThinking?: boolean; // True when AI is computing
   pieceSet?: PieceSet;
   arrows?: [string, string][]; // e.g. [["a2", "a9"]]
   highlights?: string[]; // Squares to highlight (for hints/lessons)
@@ -113,6 +115,8 @@ export const XiangqiBoard: React.FC<XiangqiBoardProps> = ({
   legalMoves = [],
   lastMove,
   checkSquare,
+  illegalSquare,
+  isThinking = false,
   pieceSet = 'traditional',
   arrows = [],
   highlights = [],
@@ -392,8 +396,19 @@ export const XiangqiBoard: React.FC<XiangqiBoardProps> = ({
           })}
         </svg>
 
+        {/* AI Thinking Laser Scanner Overlay */}
+        {isThinking && (
+          <div className="board-ai-scanning-overlay">
+            <div className="ai-scanner-beam"></div>
+            <div className="ai-thinking-badge">
+              <span className="thinking-spinner"></span>
+              <span>AI đang tính toán...</span>
+            </div>
+          </div>
+        )}
+
         {/* 90 Exact Intersection Points */}
-        <div className="intersections-layer">
+        <div className={`intersections-layer ${isThinking ? 'ai-busy' : ''}`}>
           {Array.from({ length: 10 }).map((_, r) =>
             Array.from({ length: 9 }).map((_, c) => {
               const sq = toSquare(r, c);
@@ -405,6 +420,7 @@ export const XiangqiBoard: React.FC<XiangqiBoardProps> = ({
               const isLastMoveFrom = lastMove?.from === sq;
               const isLastMoveTo = lastMove?.to === sq;
               const isCheck = checkSquare === sq;
+              const isIllegal = illegalSquare === sq;
               const isHighlighted = highlights.includes(sq);
               const isTouchHover = touchHoverSquare === sq;
 
@@ -413,9 +429,11 @@ export const XiangqiBoard: React.FC<XiangqiBoardProps> = ({
                   key={sq}
                   className={`board-intersection ${isSelected ? 'selected' : ''} ${
                     isLegal ? 'legal' : ''
-                  } ${isLastMoveFrom || isLastMoveTo ? 'last-move' : ''} ${
-                    isCheck ? 'in-check' : ''
-                  } ${isHighlighted ? 'highlighted' : ''} ${isTouchHover ? 'touch-hover' : ''}`}
+                  } ${isLastMoveFrom ? 'last-move-from' : ''} ${isLastMoveTo ? 'last-move-to' : ''} ${
+                    isLastMoveFrom || isLastMoveTo ? 'last-move' : ''
+                  } ${isCheck ? 'in-check' : ''} ${isIllegal ? 'illegal-shake' : ''} ${
+                    isHighlighted ? 'highlighted' : ''
+                  } ${isTouchHover ? 'touch-hover' : ''}`}
                   style={{
                     left: `${leftPercent}%`,
                     top: `${topPercent}%`,
@@ -425,9 +443,11 @@ export const XiangqiBoard: React.FC<XiangqiBoardProps> = ({
                   onDrop={(e) => handleDrop(e, sq)}
                   data-square={sq}
                 >
-                  {/* Legal move indicator (dot or capture ring) */}
+                  {/* Legal move indicator (dot or capture target reticle) */}
                   {isLegal && (
-                    <span className={`legal-indicator ${piece ? 'capture-ring' : 'dot'}`} />
+                    <span className={`legal-indicator ${piece ? 'capture-ring' : 'dot'}`}>
+                      {piece && <span className="target-reticle-bracket" />}
+                    </span>
                   )}
 
                   {/* Piece Component */}
@@ -435,8 +455,8 @@ export const XiangqiBoard: React.FC<XiangqiBoardProps> = ({
                     <div
                       className={`piece-token ${piece.side} ${
                         pieceSet === 'vietnamese' ? 'viet-token' : ''
-                      } ${isSelected ? 'piece-selected' : ''}`}
-                      draggable={interactive && (!turn || piece.side === turn)}
+                      } ${isSelected ? 'piece-selected' : ''} ${isIllegal ? 'piece-shake' : ''}`}
+                      draggable={interactive && !isThinking && (!turn || piece.side === turn)}
                       onDragStart={(e) => handleDragStart(e, sq, piece)}
                       onTouchStart={() => handleTouchStart(sq, piece)}
                       title={`${VIETNAMESE_NAMES[piece.type]} (${

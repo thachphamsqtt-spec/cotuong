@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { XiangqiGame } from '../../core/gameEngine';
 import { Board, Move, Side, Square } from '../../core/types';
 import { AI_DIFFICULTIES, AIDifficultyConfig } from '../../ai/difficulty';
@@ -19,6 +19,8 @@ import {
 } from '../../play/gameStorage';
 import { exportToPGN } from '../../core/pgn';
 import { GameHistoryModal } from './GameHistoryModal';
+import { ShortcutsModal } from './ShortcutsModal';
+import { diagnoseIllegalMove } from '../../core/moveDiagnostics';
 
 interface PlayViewProps {
   pieceSet: PieceSet;
@@ -50,21 +52,30 @@ export const PlayView: React.FC<PlayViewProps> = ({
   const [blackTime, setBlackTime] = useState<number>(600);
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
+  const [illegalSquare, setIllegalSquare] = useState<Square | null>(null);
+  const [showLegalMovesPreview, setShowLegalMovesPreview] = useState<boolean>(true);
+  const [isFlipped, setIsFlipped] = useState<boolean>(() => playerSide === 'black');
   const [moveHistory, setMoveHistory] = useState<{ notation: string; move: Move }[]>([]);
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessage] = useState<{ text: string; type: 'info' | 'error' | 'success' } | null>(null);
   const [gameOverModal, setGameOverModal] = useState<{
     show: boolean;
     title: string;
     reason: string;
   } | null>(null);
 
-  // History & Import Modal
+  // Modals
   const [historyModalOpen, setHistoryModalOpen] = useState<boolean>(false);
+  const [shortcutsModalOpen, setShortcutsModalOpen] = useState<boolean>(false);
   const [savedHistory, setSavedHistory] = useState<StoredGameRecord[]>(() => loadGameHistory());
 
   const initialBoardRef = useRef<Board>(game.getBoard());
   const initialFENRef = useRef<string>(customInitialFEN || INITIAL_FEN);
   const [, setGameVersion] = useState<number>(0);
+
+  // Synchronize board flip when player changes side
+  useEffect(() => {
+    setIsFlipped(playerSide === 'black');
+  }, [playerSide]);
 
   // Auto-restore active game if present on initial mount (and not overridden by customInitialFEN)
   useEffect(() => {
@@ -78,7 +89,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
         setMoveHistory([]);
         setSelectedSquare(null);
         setGameOverModal(null);
-        setFeedbackMessage('Đã bắt đầu ván cờ từ thế xếp tùy biến!');
+        setFeedbackMessage({ text: 'Đã bắt đầu ván cờ từ thế xếp tùy biến!', type: 'info' });
       } catch (err) {
         console.error('Failed to init game from custom FEN', err);
       }
@@ -111,7 +122,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
         setRedTime(active.redTime || 600);
         setBlackTime(active.blackTime || 600);
         setMoveHistory(restoredHistory);
-        setFeedbackMessage('⚡ Đã tự động khôi phục ván cờ dở dang của bạn.');
+        setFeedbackMessage({ text: '⚡ Đã tự động khôi phục ván cờ dở dang của bạn.', type: 'info' });
       } catch (err) {
         console.error('Failed to restore active game', err);
       }
@@ -220,7 +231,6 @@ export const PlayView: React.FC<PlayViewProps> = ({
     soundEffects.playVictory();
     setGameOverModal({ show: true, title, reason });
 
-    // Determine result
     let result: 'win' | 'loss' | 'draw' = 'draw';
     if (title.includes('Hòa')) {
       result = 'draw';
@@ -230,7 +240,6 @@ export const PlayView: React.FC<PlayViewProps> = ({
       result = 'loss';
     }
 
-    // Save finished game to history library
     const record: StoredGameRecord = {
       id: `game_${Date.now()}`,
       createdAt: Date.now(),
@@ -275,7 +284,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
 
     saveGameToHistory(record);
     setSavedHistory(loadGameHistory());
-    setFeedbackMessage('💾 Đã lưu ván cờ vào Lịch sử thành công!');
+    setFeedbackMessage({ text: '💾 Đã lưu ván cờ vào Lịch sử thành công!', type: 'success' });
     setTimeout(() => setFeedbackMessage(null), 3000);
   };
 
@@ -306,7 +315,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
       setMoveHistory(restoredHistory);
       setSelectedSquare(null);
       setGameOverModal(null);
-      setFeedbackMessage(`🔄 Đã mở lại ván cờ: ${record.dateFormatted}`);
+      setFeedbackMessage({ text: `🔄 Đã mở lại ván cờ: ${record.dateFormatted}`, type: 'info' });
     } catch (err) {
       console.error('Failed to resume game', err);
     }
@@ -337,7 +346,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
       setMoveHistory(importedHistory);
       setSelectedSquare(null);
       setGameOverModal(null);
-      setFeedbackMessage(`📥 Đã nạp thành công ${title || 'ván cờ'}!`);
+      setFeedbackMessage({ text: `📥 Đã nạp thành công ${title || 'ván cờ'}!`, type: 'success' });
     } catch (err) {
       console.error('Failed to import game', err);
     }
@@ -358,12 +367,10 @@ export const PlayView: React.FC<PlayViewProps> = ({
       const notation = toVietnameseNotation(boardBefore, result.move, notationFormat);
       setMoveHistory((prev) => [...prev, { notation, move: result.move! }]);
 
-      // Check sound alert if move causes check
       if (result.status === 'check') {
         soundEffects.playCheck();
       }
 
-      // Add increment if 15m10s
       if (timeControl === '15m10s') {
         if (result.move.side === 'red') setRedTime((t) => t + 10);
         else setBlackTime((t) => t + 10);
@@ -371,34 +378,84 @@ export const PlayView: React.FC<PlayViewProps> = ({
 
       setGameVersion((v) => v + 1);
       setSelectedSquare(null);
+      setIllegalSquare(null);
     }
   };
 
   const handleSquareClick = (square: Square) => {
     if (isThinking || gameOverModal?.show) return;
-    if (game.getTurn() !== playerSide) return;
+    if (game.getTurn() !== playerSide) {
+      setFeedbackMessage({ text: '⏳ Đang là lượt đi của máy, vui lòng chờ trong giây lát!', type: 'info' });
+      return;
+    }
+
+    const currentBoard = game.getBoard();
+    const { row, col } = parseSquare(square);
+    const clickedPiece = currentBoard[row][col];
 
     if (selectedSquare) {
+      if (selectedSquare === square) {
+        // Deselect on second click
+        setSelectedSquare(null);
+        return;
+      }
+
       const legalMoves = game.getMovesForPiece(selectedSquare);
       const isLegal = legalMoves.some((m) => m.to === square);
+
       if (isLegal) {
         executeMove(selectedSquare, square);
+        return;
+      } else {
+        // If clicking another piece of the same side, switch selection smoothly
+        if (clickedPiece && clickedPiece.side === playerSide) {
+          setSelectedSquare(square);
+          setIllegalSquare(null);
+          setFeedbackMessage(null);
+          return;
+        }
+
+        // Illegal move attempted: diagnose and explain why
+        const errorReason = diagnoseIllegalMove(currentBoard, selectedSquare, square, playerSide);
+        setIllegalSquare(square);
+        setFeedbackMessage({ text: `❌ ${errorReason}`, type: 'error' });
+
+        // Clear illegal shake after 600ms
+        setTimeout(() => setIllegalSquare(null), 600);
         return;
       }
     }
 
-    const { row, col } = parseSquare(square);
-    const piece = game.getBoard()[row][col];
-    if (piece && piece.side === playerSide) {
-      setSelectedSquare(square);
+    // No piece was selected yet
+    if (clickedPiece) {
+      if (clickedPiece.side === playerSide) {
+        const legals = game.getMovesForPiece(square);
+        if (legals.length === 0) {
+          setIllegalSquare(square);
+          setFeedbackMessage({
+            text: `⚠️ Quân ${clickedPiece.side === 'red' ? 'Đỏ' : 'Đen'} tại ô ${square} đang bị phong tỏa, không có nước đi hợp lệ!`,
+            type: 'error',
+          });
+          setTimeout(() => setIllegalSquare(null), 600);
+        } else {
+          setSelectedSquare(square);
+          setFeedbackMessage(null);
+        }
+      } else {
+        setIllegalSquare(square);
+        setFeedbackMessage({
+          text: `⚠️ Bạn đang cầm bên ${playerSide === 'red' ? 'Đỏ' : 'Đen'}, không thể chọn quân đối phương!`,
+          type: 'error',
+        });
+        setTimeout(() => setIllegalSquare(null), 600);
+      }
     } else {
       setSelectedSquare(null);
     }
   };
 
-  const handleUndo = () => {
+  const handleUndo = useCallback(() => {
     if (isThinking || moveHistory.length === 0) return;
-    // In human vs AI, undo twice to revert AI's reply and player's move
     game.undo();
     if (game.getTurn() !== playerSide && game.getHistory().length > 0) {
       game.undo();
@@ -406,41 +463,44 @@ export const PlayView: React.FC<PlayViewProps> = ({
     setMoveHistory((prev) => prev.slice(0, game.getHistory().length));
     setGameVersion((v) => v + 1);
     setSelectedSquare(null);
-    setFeedbackMessage('Đã hoàn tác nước cờ.');
-  };
+    setIllegalSquare(null);
+    setFeedbackMessage({ text: '↩️ Đã hoàn tác nước cờ.', type: 'info' });
+  }, [isThinking, moveHistory.length, playerSide, game]);
 
-  const handleHint = () => {
+  const handleHint = useCallback(() => {
     if (isThinking || game.getTurn() !== playerSide) return;
     const searchRes = searchBestMove(game.getBoard(), playerSide, 3);
     if (searchRes.bestMove) {
       setSelectedSquare(searchRes.bestMove.from);
-      setFeedbackMessage(`Gợi ý: Quân tại ô ${searchRes.bestMove.from} có thể tiến về ${searchRes.bestMove.to}.`);
+      setFeedbackMessage({
+        text: `💡 Gợi ý nước cờ tối ưu: Quân tại ô ${searchRes.bestMove.from} nên tiến về ${searchRes.bestMove.to}.`,
+        type: 'info',
+      });
     }
-  };
+  }, [isThinking, playerSide, game]);
 
-  const handleOfferDraw = () => {
+  const handleOfferDraw = useCallback(() => {
     if (isThinking || gameOverModal?.show) return;
     const score = evaluateBoard(game.getBoard());
     const machineScore = playerSide === 'red' ? -score : score;
 
     if (machineScore > 80) {
-      setFeedbackMessage('🤖 Máy: "Thế trận của tôi đang chiếm ưu thế lớn, tôi xin từ chối hòa!"');
+      setFeedbackMessage({ text: '🤖 Máy: "Thế trận của tôi đang chiếm ưu thế lớn, tôi xin từ chối hòa!"', type: 'error' });
     } else {
       handleGameOver('Hòa Cờ Thỏa Thuận', 'Máy đã đồng ý lời xin hòa của bạn vì thế trận cân bằng.');
     }
-  };
+  }, [isThinking, gameOverModal?.show, game, playerSide]);
 
   const handleResign = () => {
     const winner = playerSide === 'red' ? 'Đen' : 'Đỏ';
     handleGameOver('Xin Thua', `Bạn đã nhận thua. ${winner} thắng cuộc!`);
   };
 
-  const handleNewGame = () => {
+  const handleNewGame = useCallback(() => {
     if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current);
     isThinkingRef.current = false;
     setIsThinking(false);
 
-    // Save previous game if had moves
     if (moveHistory.length > 2 && !gameOverModal?.show) {
       saveGameToHistory({
         id: `abandoned_${Date.now()}`,
@@ -470,6 +530,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
     initialFENRef.current = INITIAL_FEN;
     setMoveHistory([]);
     setSelectedSquare(null);
+    setIllegalSquare(null);
     setGameOverModal(null);
     setFeedbackMessage(null);
 
@@ -486,7 +547,57 @@ export const PlayView: React.FC<PlayViewProps> = ({
 
     setRedTime(initialSeconds);
     setBlackTime(initialSeconds);
-  };
+  }, [moveHistory.length, gameOverModal?.show, playerSide, aiConfig, timeControl, game]);
+
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept when user is typing in inputs or textareas
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT')) {
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        handleUndo();
+        return;
+      }
+
+      switch (e.key.toLowerCase()) {
+        case 'u':
+          handleUndo();
+          break;
+        case 'h':
+          handleHint();
+          break;
+        case 'n':
+          if (window.confirm('Bắt đầu ván cờ mới?')) {
+            handleNewGame();
+          }
+          break;
+        case 'f':
+          setIsFlipped((prev) => !prev);
+          break;
+        case 'p':
+          setShowLegalMovesPreview((prev) => !prev);
+          break;
+        case '?':
+        case 'k':
+          setShortcutsModalOpen(true);
+          break;
+        case 'escape':
+          setSelectedSquare(null);
+          setIllegalSquare(null);
+          setShortcutsModalOpen(false);
+          setHistoryModalOpen(false);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo, handleHint, handleNewGame]);
 
   const handleQuickCopyPGN = () => {
     const pgn = exportToPGN({
@@ -500,7 +611,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
       initialFEN: initialFENRef.current,
     });
     navigator.clipboard.writeText(pgn);
-    setFeedbackMessage('📋 Đã sao chép biên bản PGN vào bộ nhớ tạm!');
+    setFeedbackMessage({ text: '📋 Đã sao chép biên bản PGN vào bộ nhớ tạm!', type: 'success' });
     setTimeout(() => setFeedbackMessage(null), 2500);
   };
 
@@ -588,12 +699,33 @@ export const PlayView: React.FC<PlayViewProps> = ({
 
         <div className="play-topbar-history-actions">
           <button
+            className={`btn-secondary btn-sm ${showLegalMovesPreview ? 'btn-active-highlight' : ''}`}
+            onClick={() => setShowLegalMovesPreview((prev) => !prev)}
+            title="Bật/Tắt xem trước nước đi hợp lệ trên bàn cờ (Phím tắt: P)"
+          >
+            {showLegalMovesPreview ? '👁️ Nước đi: Bật' : '👁️‍🗨️ Nước đi: Tắt'}
+          </button>
+          <button
+            className="btn-secondary btn-sm"
+            onClick={() => setIsFlipped((prev) => !prev)}
+            title="Đảo góc nhìn bàn cờ (Phím tắt: F)"
+          >
+            🔄 Đảo bàn
+          </button>
+          <button
+            className="btn-secondary btn-sm"
+            onClick={() => setShortcutsModalOpen(true)}
+            title="Xem danh sách phím tắt (Phím tắt: ?)"
+          >
+            ⌨️ Phím tắt
+          </button>
+          <button
             className="btn-secondary btn-sm"
             onClick={() => {
               setSavedHistory(loadGameHistory());
               setHistoryModalOpen(true);
             }}
-            title="Xem danh sách ván cờ đã lưu & Nhập/Xuất"
+            title="Xem danh sách ván cờ đã lưu & Nhập/Xuất PGN/FEN"
           >
             📚 Lịch sử ({savedHistory.length})
           </button>
@@ -613,10 +745,14 @@ export const PlayView: React.FC<PlayViewProps> = ({
         <div className="play-board-col">
           {/* Opponent Clock (top) */}
           {timeControl !== 'none' && (
-            <div className={`player-clock top ${game.getTurn() !== playerSide ? 'active' : ''}`}>
-              <span className="clock-name">
-                🤖 Máy ({aiConfig.name}) - {playerSide === 'red' ? 'Đen' : 'Đỏ'}
-              </span>
+            <div className={`player-clock top ${game.getTurn() !== playerSide ? 'active' : ''} ${isThinking ? 'thinking-aura' : ''}`}>
+              <div className="clock-identity">
+                <span className="clock-avatar">🤖</span>
+                <span className="clock-name">
+                  Máy ({aiConfig.name}) - {playerSide === 'red' ? 'Đen' : 'Đỏ'}
+                </span>
+                {isThinking && <span className="ai-thinking-indicator">⚡ Đang tính...</span>}
+              </div>
               <span className="clock-digits">
                 {formatClock(playerSide === 'red' ? blackTime : redTime)}
               </span>
@@ -626,10 +762,12 @@ export const PlayView: React.FC<PlayViewProps> = ({
           <XiangqiBoard
             board={game.getBoard()}
             turn={game.getTurn()}
-            flipped={playerSide === 'black'}
+            flipped={isFlipped}
             selectedSquare={selectedSquare}
-            legalMoves={legalMoves}
+            legalMoves={showLegalMovesPreview ? legalMoves : []}
             lastMove={game.getLastMove()}
+            illegalSquare={illegalSquare}
+            isThinking={isThinking}
             pieceSet={pieceSet}
             onSquareClick={handleSquareClick}
             onMove={(from, to) => executeMove(from, to)}
@@ -638,9 +776,12 @@ export const PlayView: React.FC<PlayViewProps> = ({
           {/* Player Clock (bottom) */}
           {timeControl !== 'none' && (
             <div className={`player-clock bottom ${game.getTurn() === playerSide ? 'active' : ''}`}>
-              <span className="clock-name">
-                👤 Bạn - {playerSide === 'red' ? 'Đỏ' : 'Đen'}
-              </span>
+              <div className="clock-identity">
+                <span className="clock-avatar">👤</span>
+                <span className="clock-name">
+                  Bạn - {playerSide === 'red' ? 'Đỏ' : 'Đen'}
+                </span>
+              </div>
               <span className="clock-digits">
                 {formatClock(playerSide === 'red' ? redTime : blackTime)}
               </span>
@@ -654,10 +795,12 @@ export const PlayView: React.FC<PlayViewProps> = ({
             <div className="game-status-header">
               <div className="turn-status-badge">
                 {isThinking ? (
-                  <span className="thinking-pulse">🤖 Máy đang suy nghĩ...</span>
+                  <span className="thinking-pulse">
+                    <span className="thinking-spinner"></span> 🤖 Máy đang suy nghĩ nước đi...
+                  </span>
                 ) : (
                   <span>
-                    Lượt đi: <strong>{game.getTurn() === 'red' ? 'Đỏ' : 'Đen'}</strong>
+                    Lượt đi: <strong className={game.getTurn() === 'red' ? 'turn-red' : 'turn-black'}>{game.getTurn() === 'red' ? '🔴 Đỏ' : '⚫ Đen'}</strong>
                     {game.getStatus() === 'check' && (
                       <span className="check-alert-badge"> ⚡ CHIẾU TƯỚNG!</span>
                     )}
@@ -667,8 +810,8 @@ export const PlayView: React.FC<PlayViewProps> = ({
             </div>
 
             {feedbackMessage && (
-              <div className="feedback-alert info" style={{ margin: '8px 0' }}>
-                {feedbackMessage}
+              <div className={`feedback-alert ${feedbackMessage.type}`} style={{ margin: '8px 0' }}>
+                {feedbackMessage.text}
               </div>
             )}
 
@@ -714,17 +857,17 @@ export const PlayView: React.FC<PlayViewProps> = ({
                 className="btn-secondary"
                 onClick={handleUndo}
                 disabled={isThinking || moveHistory.length === 0}
-                title="Đi lại nước cờ trước"
+                title="Đi lại nước cờ trước (Phím tắt: Ctrl+Z hoặc U)"
               >
-                ↩️ Đi lại
+                ↩️ Đi lại <kbd className="mini-kbd">U</kbd>
               </button>
               <button
                 className="btn-secondary"
                 onClick={handleHint}
                 disabled={isThinking || game.getTurn() !== playerSide}
-                title="Gợi ý nước đi tối ưu"
+                title="Gợi ý nước đi tối ưu (Phím tắt: H)"
               >
-                💡 Gợi ý
+                💡 Gợi ý <kbd className="mini-kbd">H</kbd>
               </button>
               <button
                 className="btn-secondary"
@@ -737,8 +880,8 @@ export const PlayView: React.FC<PlayViewProps> = ({
               <button className="btn-secondary" onClick={handleResign} title="Chấp nhận thua cuộc">
                 🏳️ Xin thua
               </button>
-              <button className="btn-primary" onClick={handleNewGame} title="Bắt đầu ván mới">
-                🔄 Ván mới
+              <button className="btn-primary" onClick={handleNewGame} title="Bắt đầu ván mới (Phím tắt: N)">
+                🔄 Ván mới <kbd className="mini-kbd">N</kbd>
               </button>
             </div>
           </div>
@@ -781,6 +924,12 @@ export const PlayView: React.FC<PlayViewProps> = ({
         }}
         onImportGame={handleImportGame}
         onRefreshHistory={() => setSavedHistory(loadGameHistory())}
+      />
+
+      {/* Shortcuts Modal */}
+      <ShortcutsModal
+        isOpen={shortcutsModalOpen}
+        onClose={() => setShortcutsModalOpen(false)}
       />
     </div>
   );

@@ -329,81 +329,175 @@ select {
   box-sizing: border-box;
   pointer-events: auto;
   border-radius: 50%;
+  transition: transform 0.15s ease;
 }
 
 .board-intersection.selected::after {
   content: '';
   position: absolute;
+  width: 106%;
+  height: 106%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(241, 196, 15, 0.4) 0%, rgba(212, 175, 55, 0.15) 70%, transparent 100%);
+  box-shadow: 0 0 20px rgba(241, 196, 15, 0.9), inset 0 0 10px rgba(255, 255, 255, 0.6);
+  border: 2px solid rgba(241, 196, 15, 0.95);
+  pointer-events: none;
+  z-index: 5;
+  animation: selectHalo 1.8s infinite ease-in-out;
+}
+
+/* Last move start point (from) */
+.board-intersection.last-move-from::before {
+  content: '';
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  border: 2px dashed rgba(243, 156, 18, 0.85);
+  background: rgba(243, 156, 18, 0.15);
+  pointer-events: none;
+  z-index: 5;
+  animation: pulseGentle 2s infinite ease-in-out;
+}
+
+/* Last move landing point (to) */
+.board-intersection.last-move-to::before {
+  content: '';
+  position: absolute;
   width: 98%;
   height: 98%;
   border-radius: 50%;
-  background: rgba(241, 196, 15, 0.4);
-  box-shadow: 0 0 16px rgba(241, 196, 15, 0.85);
+  border: 2.5px solid #2ecc71;
+  background: radial-gradient(circle, rgba(46, 204, 113, 0.25) 0%, transparent 80%);
+  box-shadow: 0 0 15px rgba(46, 204, 113, 0.7);
   pointer-events: none;
   z-index: 5;
+  animation: landRipple 0.6s ease-out;
 }
 
-.board-intersection.last-move::before {
-  content: '';
-  position: absolute;
-  width: 96%;
-  height: 96%;
-  border-radius: 50%;
-  border: 2px dashed rgba(212, 175, 55, 0.85);
-  pointer-events: none;
-  z-index: 5;
-}
-
+/* In-check Alert on General */
 .board-intersection.in-check::after {
   content: '';
   position: absolute;
-  width: 104%;
-  height: 104%;
+  width: 110%;
+  height: 110%;
   border-radius: 50%;
-  background: rgba(231, 76, 60, 0.45);
-  box-shadow: 0 0 22px rgba(231, 76, 60, 0.95);
-  animation: checkPulse 1s infinite alternate ease-in-out;
+  background: radial-gradient(circle, rgba(231, 76, 60, 0.55) 0%, rgba(231, 76, 60, 0.15) 70%, transparent 100%);
+  border: 3px solid #e74c3c;
+  box-shadow: 0 0 25px rgba(231, 76, 60, 1), 0 0 40px rgba(231, 76, 60, 0.6);
+  animation: checkPulse 0.7s infinite alternate ease-in-out;
   pointer-events: none;
-  z-index: 5;
+  z-index: 6;
+}
+
+/* Illegal move shake effect */
+.board-intersection.illegal-shake,
+.piece-token.piece-shake {
+  animation: shakeIllegal 0.4s ease-in-out !important;
+}
+
+@keyframes shakeIllegal {
+  0%, 100% { transform: translate(-50%, -50%); }
+  20%, 60% { transform: translate(calc(-50% - 6px), -50%); }
+  40%, 80% { transform: translate(calc(-50% + 6px), -50%); }
+}
+
+@keyframes selectHalo {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+@keyframes pulseGentle {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes landRipple {
+  from { transform: scale(0.6); opacity: 0.2; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 @keyframes checkPulse {
-  from { transform: scale(0.92); opacity: 0.65; }
-  to { transform: scale(1.12); opacity: 1; }
+  from { transform: scale(0.95); opacity: 0.7; }
+  to { transform: scale(1.15); opacity: 1; }
 }
 
 .board-intersection.highlighted::before {
   content: '';
   position: absolute;
-  width: 94%;
-  height: 94%;
+  width: 96%;
+  height: 96%;
   border-radius: 50%;
   background: rgba(46, 204, 113, 0.35);
-  box-shadow: 0 0 14px rgba(46, 204, 113, 0.7);
+  box-shadow: 0 0 16px rgba(46, 204, 113, 0.8);
+  border: 2px solid #2ecc71;
   pointer-events: none;
   z-index: 5;
 }
 
-/* Legal Move Indicators */
+/* ==========================================================================
+   LEGAL MOVE INDICATORS
+   ========================================================================== */
 .legal-indicator.dot {
   position: absolute;
-  width: 26%;
-  height: 26%;
+  width: 28%;
+  height: 28%;
   border-radius: 50%;
-  background: rgba(46, 125, 50, 0.85);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  background: radial-gradient(circle, #2ecc71, #27ae60);
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.9), 0 2px 4px rgba(0, 0, 0, 0.4);
   pointer-events: none;
   z-index: 6;
+  animation: dotPulse 1.8s infinite ease-in-out;
 }
 
+.legal-indicator.dot::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(46, 204, 113, 0.6);
+  animation: rippleRing 2s infinite ease-out;
+}
+
+@keyframes dotPulse {
+  0%, 100% { transform: scale(0.9); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes rippleRing {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* Capture Target Reticle (Eating Enemy Piece) */
 .legal-indicator.capture-ring {
   position: absolute;
-  width: 96%;
-  height: 96%;
+  width: 104%;
+  height: 104%;
   border-radius: 50%;
-  border: 3px solid rgba(231, 76, 60, 0.88);
+  border: 3px solid #e74c3c;
+  box-shadow: 0 0 16px rgba(231, 76, 60, 0.9), inset 0 0 8px rgba(231, 76, 60, 0.5);
   pointer-events: none;
   z-index: 6;
+  animation: targetPulse 1.4s infinite alternate ease-in-out;
+}
+
+.target-reticle-bracket {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed #ff7675;
+  animation: rotateSlow 8s infinite linear;
+}
+
+@keyframes targetPulse {
+  from { transform: scale(0.96); }
+  to { transform: scale(1.06); }
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ==========================================================================
@@ -411,26 +505,29 @@ select {
    ========================================================================== */
 .piece-token {
   position: relative;
-  width: 88%;
-  height: 88%;
+  width: 90%;
+  height: 90%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff2d9, #e6c086);
-  border: 2px solid #8e622f;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.7);
+  background: radial-gradient(circle at 35% 35%, #fff5e3, #e8be80, #c89a54);
+  border: 2.5px solid #73481b;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.45), inset 0 2px 5px rgba(255, 255, 255, 0.85);
   display: grid;
   place-items: center;
-  transition: transform 0.15s ease;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
   z-index: 4;
 }
 
 .piece-token:hover {
-  transform: scale(1.06);
+  transform: translateY(-2px) scale(1.06);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
 }
 
 .piece-token.piece-selected {
-  transform: translateY(-4px) scale(1.08);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.45);
+  transform: translateY(-6px) scale(1.12);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.6), 0 0 18px rgba(241, 196, 15, 0.85);
+  border-color: #d4af37;
+  z-index: 8;
 }
 
 .piece-inner-bevel {
@@ -3370,5 +3467,201 @@ input:checked + .slider:before {
 .import-actions {
   display: flex;
   justify-content: flex-end;
+}
+
+/* ==========================================================================
+   AI THINKING LASER SCANNER & CLOCK AURA
+   ========================================================================== */
+.board-ai-scanning-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+  background: rgba(230, 126, 34, 0.05);
+}
+
+.ai-scanner-beam {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent 0%, rgba(243, 156, 18, 0.8) 50%, transparent 100%);
+  box-shadow: 0 0 14px rgba(243, 156, 18, 0.9), 0 0 28px rgba(230, 126, 34, 0.6);
+  animation: scanLaser 2.2s infinite ease-in-out;
+}
+
+@keyframes scanLaser {
+  0% { top: 0%; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.ai-thinking-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(20, 16, 12, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--gold-accent);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gold-accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.thinking-spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-accent);
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.player-clock.top.thinking-aura {
+  border-color: #e67e22;
+  box-shadow: 0 0 16px rgba(230, 126, 34, 0.4);
+  animation: pulseClock 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes pulseClock {
+  from { border-color: rgba(230, 126, 34, 0.6); }
+  to { border-color: #f39c12; }
+}
+
+.clock-identity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clock-avatar {
+  font-size: 1.15rem;
+}
+
+.ai-thinking-indicator {
+  font-size: 0.75rem;
+  color: #f39c12;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.turn-red {
+  color: #e74c3c;
+}
+
+.turn-black {
+  color: var(--gold-accent);
+}
+
+/* ==========================================================================
+   KEYBOARD SHORTCUTS MODAL & BADGES
+   ========================================================================== */
+.mini-kbd {
+  display: inline-block;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 4px;
+  color: var(--text-muted);
+}
+
+.shortcuts-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  width: min(92vw, 560px);
+  max-height: 85vh;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.2s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.shortcuts-modal-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.shortcuts-intro-text {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.shortcuts-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  gap: 12px;
+}
+
+.shortcut-keys {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.kbd-badge {
+  font-family: monospace;
+  font-size: 0.85rem;
+  font-weight: 800;
+  background: var(--bg-primary);
+  border: 1px solid var(--gold-accent);
+  color: var(--gold-accent);
+  padding: 3px 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.shortcut-or {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.shortcut-details {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  gap: 2px;
+}
+
+.shortcut-details strong {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.shortcut-details span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
 }
 
