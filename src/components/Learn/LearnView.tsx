@@ -188,7 +188,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ pieceSet }) => {
   const progressPercent = Math.round((completedCount / totalCount) * 100);
 
   // Compute solution arrows if requested
-  const displayArrows = (currentStep as any).arrows || [];
+  const displayArrows: [string, string][] = [...((currentStep as any).arrows || [])];
   if (showSolution && currentStep.type === 'try') {
     const tryStep = currentStep as TryStep;
     if (tryStep.expectedMoves.length > 0) {
