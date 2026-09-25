@@ -4848,6 +4848,7 @@ input:checked + .slider:before {
 
 /* Two Player Modals */
 .two-player-modal {
+  position: relative;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
@@ -4856,6 +4857,25 @@ input:checked + .slider:before {
   text-align: center;
   box-shadow: var(--shadow-lg);
   animation: fadeIn 0.22s ease;
+}
+
+.modal-close-icon-btn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.modal-close-icon-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .two-player-modal h3 {

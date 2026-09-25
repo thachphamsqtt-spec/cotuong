@@ -16,6 +16,7 @@ export type P2PMessageType =
   | 'RESIGN'
   | 'REMATCH_REQUEST'
   | 'REMATCH_ACCEPT'
+  | 'REMATCH_REJECT'
   | 'CHAT_MESSAGE'
   | 'EMOJI_REACTION'
   | 'PING'
@@ -51,6 +52,7 @@ export interface P2PCallbacks {
   onOpponentResigned?: () => void;
   onRematchRequested?: () => void;
   onRematchAccepted?: () => void;
+  onRematchRejected?: () => void;
   onChatMessage?: (sender: string, text: string) => void;
   onEmojiReceived?: (sender: string, emoji: string) => void;
   onError?: (err: string) => void;
@@ -301,6 +303,18 @@ export class P2PService {
     });
   }
 
+  public rejectRematch() {
+    this.sendMessage({
+      type: 'REMATCH_REJECT',
+      senderName: this.myName,
+      timestamp: Date.now(),
+    });
+  }
+
+  public isConnected(): boolean {
+    return Boolean(this.conn && this.conn.open);
+  }
+
   public sendChat(text: string) {
     this.sendMessage({
       type: 'CHAT_MESSAGE',
@@ -434,6 +448,10 @@ export class P2PService {
 
       case 'REMATCH_ACCEPT':
         this.callbacks.onRematchAccepted?.();
+        break;
+
+      case 'REMATCH_REJECT':
+        this.callbacks.onRematchRejected?.();
         break;
 
       case 'CHAT_MESSAGE':

@@ -67,6 +67,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
   const [onlineChatMessages, setOnlineChatMessages] = useState<Array<{ sender: string; text: string; time: string }>>([]);
   const [chatInput, setChatInput] = useState<string>('');
   const [recentEmojiReaction, setRecentEmojiReaction] = useState<{ sender: string; emoji: string } | null>(null);
+  const [isRematchSent, setIsRematchSent] = useState<boolean>(false);
 
   // Online Dialogs & Confirmations
   const [incomingDrawOffer, setIncomingDrawOffer] = useState<boolean>(false);
@@ -141,7 +142,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     return () => clearInterval(timer);
   }, [localGame, localGameOverModal, localTimeControl]);
 
-  // --- Online Game Clocks ---
+  // --- Online Game Clocks Timer Tick ---
   useEffect(() => {
     if (!onlineGameActive || onlineGameOverModal?.show || onlineTimeControl === 'none') return;
 
@@ -149,33 +150,13 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
       const turn = onlineGame.getTurn();
       if (turn === 'red') {
         setOnlineRedTime((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            const winner = mySide === 'red' ? 'Đối thủ' : 'Bạn';
-            soundEffects.playDefeat();
-            setOnlineGameOverModal({
-              show: true,
-              title: 'HẾT GIỜ!',
-              reason: `Bên Đỏ hết giờ. ${winner} thắng cuộc!`,
-            });
-            return 0;
-          }
+          if (prev <= 1) return 0;
           if (prev === 30 || prev === 10) soundEffects.playCheck();
           return prev - 1;
         });
       } else {
         setOnlineBlackTime((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            const winner = mySide === 'black' ? 'Đối thủ' : 'Bạn';
-            soundEffects.playDefeat();
-            setOnlineGameOverModal({
-              show: true,
-              title: 'HẾT GIỜ!',
-              reason: `Bên Đen hết giờ. ${winner} thắng cuộc!`,
-            });
-            return 0;
-          }
+          if (prev <= 1) return 0;
           if (prev === 30 || prev === 10) soundEffects.playCheck();
           return prev - 1;
         });
@@ -183,7 +164,30 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [onlineGameActive, onlineGame, onlineGameOverModal, onlineTimeControl, mySide, onlineMoveHistory]);
+  }, [onlineGameActive, onlineGame, onlineGameOverModal, onlineTimeControl]);
+
+  // --- Online Timeout Game Over Check ---
+  useEffect(() => {
+    if (!onlineGameActive || onlineGameOverModal?.show || onlineTimeControl === 'none') return;
+
+    if (onlineRedTime <= 0) {
+      const winner = mySide === 'red' ? opponentName : playerName;
+      soundEffects.playDefeat();
+      setOnlineGameOverModal({
+        show: true,
+        title: 'HẾT GIỜ!',
+        reason: `Bên Đỏ đã hết thời gian. ${winner} giành chiến thắng!`,
+      });
+    } else if (onlineBlackTime <= 0) {
+      const winner = mySide === 'black' ? opponentName : playerName;
+      soundEffects.playDefeat();
+      setOnlineGameOverModal({
+        show: true,
+        title: 'HẾT GIỜ!',
+        reason: `Bên Đen đã hết thời gian. ${winner} giành chiến thắng!`,
+      });
+    }
+  }, [onlineRedTime, onlineBlackTime, onlineGameActive, onlineGameOverModal, onlineTimeControl, mySide, opponentName, playerName]);
 
   // --- Format Seconds to MM:SS ---
   const formatTime = (secs: number) => {
@@ -305,6 +309,27 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
 
   const callbacksRef = useRef<P2PCallbacks>({});
 
+  // Helper to start online rematch
+  const startOnlineRematchGame = useCallback((newSide: Side) => {
+    setMySide(newSide);
+    const newG = new XiangqiGame();
+    onlineGameRef.current = newG;
+    setOnlineGame(newG);
+    initialOnlineBoardRef.current = newG.getBoard();
+    setOnlineGameActive(true);
+    setOnlineMoveHistory([]);
+    setOnlineSelectedSquare(null);
+    setOnlineGameOverModal(null);
+    setIncomingRematchOffer(false);
+    setIsRematchSent(false);
+
+    const initialSecs =
+      onlineTimeControl === '5m' ? 300 : onlineTimeControl === '10m' ? 600 : onlineTimeControl === '15m' ? 900 : 0;
+    setOnlineRedTime(initialSecs);
+    setOnlineBlackTime(initialSecs);
+    soundEffects.playVictory();
+  }, [onlineTimeControl]);
+
   // Proxy callbacks that always dispatch to current callbacksRef
   const proxyCallbacks = useMemo<P2PCallbacks>(() => ({
     onPeerReady: (...args) => callbacksRef.current.onPeerReady?.(...args),
@@ -322,6 +347,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     onOpponentResigned: (...args) => callbacksRef.current.onOpponentResigned?.(...args),
     onRematchRequested: (...args) => callbacksRef.current.onRematchRequested?.(...args),
     onRematchAccepted: (...args) => callbacksRef.current.onRematchAccepted?.(...args),
+    onRematchRejected: (...args) => callbacksRef.current.onRematchRejected?.(...args),
     onChatMessage: (...args) => callbacksRef.current.onChatMessage?.(...args),
     onEmojiReceived: (...args) => callbacksRef.current.onEmojiReceived?.(...args),
     onError: (...args) => callbacksRef.current.onError?.(...args),
@@ -347,11 +373,11 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
       setOnlineStatusMessage(`🟢 Đã vào phòng [${info.roomCode}] của [${info.hostName}]! Đang chờ chủ phòng bắt đầu...`);
     },
     onDisconnected: () => {
-      setOnlineStatusMessage('Đối thủ đã rời phòng hoặc mất kết nối mạng.');
+      setOnlineStatusMessage('Đối thủ đã ngắt kết nối hoặc mất mạng.');
       setOnlineGameOverModal({
         show: true,
         title: 'MẤT KẾT NỐI',
-        reason: 'Đối thủ đã ngắt kết nối khỏi ván đấu.',
+        reason: 'Đối thủ đã ngắt kết nối hoặc mất mạng. Bạn có thể đợi kết nối lại hoặc quay về phòng chờ.',
       });
     },
     onGameStart: (config: { mySide: Side; timeControl: string; opponentName: string; roomCode: string; initialFen?: string }) => {
@@ -368,6 +394,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
       setOnlineMoveHistory([]);
       setOnlineSelectedSquare(null);
       setOnlineGameOverModal(null);
+      setIsRematchSent(false);
 
       const initialSecs =
         config.timeControl === '5m' ? 300 : config.timeControl === '10m' ? 600 : config.timeControl === '15m' ? 900 : 0;
@@ -459,18 +486,13 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     },
     onRematchAccepted: () => {
       const nextSide: Side = mySide === 'red' ? 'black' : 'red';
-      setMySide(nextSide);
-      const newG = new XiangqiGame();
-      onlineGameRef.current = newG;
-      setOnlineGame(newG);
-      initialOnlineBoardRef.current = newG.getBoard();
-      setOnlineMoveHistory([]);
-      setOnlineSelectedSquare(null);
-      setOnlineGameOverModal(null);
-      const initialSecs =
-        onlineTimeControl === '5m' ? 300 : onlineTimeControl === '10m' ? 600 : onlineTimeControl === '15m' ? 900 : 0;
-      setOnlineRedTime(initialSecs);
-      setOnlineBlackTime(initialSecs);
+      startOnlineRematchGame(nextSide);
+      setOnlineStatusMessage('🟢 Ván đấu mới đã bắt đầu!');
+    },
+    onRematchRejected: () => {
+      setIsRematchSent(false);
+      setOnlineStatusMessage('Đối thủ đã từ chối đề nghị đấu lại.');
+      alert(`${opponentName} không đồng ý đấu lại ván mới.`);
     },
     onChatMessage: (sender: string, text: string) => {
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -534,6 +556,41 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     }
   };
 
+  const handleReconnectRoom = async () => {
+    const code = currentOnlineRoomCode || myRoomCode;
+    if (!code) {
+      handleLeaveOnlineRoom();
+      return;
+    }
+    setOnlineGameOverModal(null);
+    setIsConnecting(true);
+    setOnlineStatusMessage(`Đang kết nối lại phòng [${code}]...`);
+    try {
+      if (isHosting) {
+        await p2pService.init(playerName, proxyCallbacks);
+        setOnlineStatusMessage(`Đã khởi động lại máy chủ phòng [${myRoomCode}]. Đang đợi đối thủ kết nối lại...`);
+      } else {
+        await p2pService.init(playerName, proxyCallbacks);
+        await p2pService.joinRoom(code, playerName);
+        setIsGuestJoined(true);
+        setOnlineStatusMessage(`🟢 Đã kết nối lại phòng [${code}] thành công!`);
+      }
+    } catch (e: any) {
+      setOnlineStatusMessage(`Không thể kết nối lại vào phòng [${code}].`);
+      setIsConnecting(false);
+    }
+  };
+
+  const handleRequestRematch = () => {
+    if (!p2pService.isConnected()) {
+      alert('Không thể gửi đề nghị vì kết nối với đối thủ đã bị ngắt.');
+      return;
+    }
+    setIsRematchSent(true);
+    p2pService.requestRematch();
+    setOnlineStatusMessage('⏳ Đã gửi đề nghị đấu lại, đang chờ đối thủ chấp nhận...');
+  };
+
   const handleCopyInviteLink = () => {
     const code = currentOnlineRoomCode || myRoomCode;
     const url = `${window.location.origin}${window.location.pathname}?room=${code}`;
@@ -555,6 +612,8 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     setRoomHostName('');
     setOpponentName('Đối Thủ');
     setOnlineGameOverModal(null);
+    setIsRematchSent(false);
+    setIncomingRematchOffer(false);
     setOnlineStatusMessage('Đã rời phòng đấu.');
   };
 
@@ -1211,27 +1270,26 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
         <div className="modal-overlay">
           <div className="two-player-modal">
             <h3>⚡ Đề Nghị Đấu Lại</h3>
-            <p>Đối thủ <strong>{opponentName}</strong> muốn đấu lại ván mới và đổi bên cầm quân. Bạn có chấp nhận?</p>
+            <p>
+              Đối thủ <strong>{opponentName}</strong> muốn đấu lại ván mới và đổi bên cầm quân (Bạn sẽ cầm{' '}
+              <strong>{mySide === 'red' ? 'Đen' : 'Đỏ'}</strong>). Bạn có chấp nhận?
+            </p>
             <div className="modal-actions-row">
               <button
                 className="btn-secondary"
-                onClick={() => setIncomingRematchOffer(false)}
+                onClick={() => {
+                  p2pService.rejectRematch();
+                  setIncomingRematchOffer(false);
+                }}
               >
-                Để sau
+                Từ chối
               </button>
               <button
                 className="btn-primary"
                 onClick={() => {
                   p2pService.acceptRematch();
-                  setIncomingRematchOffer(false);
                   const nextSide: Side = mySide === 'red' ? 'black' : 'red';
-                  setMySide(nextSide);
-                  const newG = new XiangqiGame();
-                  setOnlineGame(newG);
-                  initialOnlineBoardRef.current = newG.getBoard();
-                  setOnlineMoveHistory([]);
-                  setOnlineSelectedSquare(null);
-                  setOnlineGameOverModal(null);
+                  startOnlineRematchGame(nextSide);
                 }}
               >
                 Đấu lại ngay ⚔️
@@ -1268,29 +1326,69 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
         </div>
       )}
 
-      {/* Online Game Over Modal */}
+      {/* Online Game Over / Disconnect Modal */}
       {onlineGameOverModal?.show && (
         <div className="modal-overlay">
           <div className="two-player-modal game-over-box">
-            <h2 className="game-over-title">🏆 {onlineGameOverModal.title}</h2>
+            <button
+              className="modal-close-icon-btn"
+              onClick={() => setOnlineGameOverModal(null)}
+              title="Đóng bảng thông báo để xem lại bàn cờ"
+            >
+              ✕
+            </button>
+            <h2 className="game-over-title">
+              {onlineGameOverModal.title === 'MẤT KẾT NỐI' ? '⚠️ ' : '🏆 '}
+              {onlineGameOverModal.title}
+            </h2>
             <p className="game-over-reason">{onlineGameOverModal.reason}</p>
-            <div className="modal-actions-row">
-              <button
-                className="btn-secondary"
-                onClick={() => {
-                  setOnlineGameOverModal(null);
-                  onAnalyzeGame(initialOnlineBoardRef.current, onlineMoveHistory.map((m) => m.move));
-                }}
-              >
-                🔍 Phân tích ván cờ
-              </button>
-              <button
-                className="btn-primary"
-                onClick={() => p2pService.requestRematch()}
-              >
-                ⚔️ Đề nghị đấu lại
-              </button>
-            </div>
+
+            {onlineGameOverModal.title === 'MẤT KẾT NỐI' ? (
+              <div className="modal-actions-row">
+                <button className="btn-primary" onClick={handleReconnectRoom}>
+                  🔄 Thử kết nối lại
+                </button>
+                <button className="btn-secondary" onClick={handleLeaveOnlineRoom}>
+                  🚪 Về phòng chờ
+                </button>
+                {onlineMoveHistory.length > 0 && (
+                  <button
+                    className="btn-secondary btn-sm full-width mt-2"
+                    onClick={() => {
+                      setOnlineGameOverModal(null);
+                      onAnalyzeGame(initialOnlineBoardRef.current, onlineMoveHistory.map((m) => m.move));
+                    }}
+                  >
+                    🔍 Phân tích các nước đã đi
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="modal-actions-row">
+                <button
+                  className="btn-secondary"
+                  onClick={() => {
+                    setOnlineGameOverModal(null);
+                    onAnalyzeGame(initialOnlineBoardRef.current, onlineMoveHistory.map((m) => m.move));
+                  }}
+                >
+                  🔍 Phân tích ván cờ
+                </button>
+                <button
+                  className="btn-primary"
+                  onClick={handleRequestRematch}
+                  disabled={isRematchSent}
+                >
+                  {isRematchSent ? '⏳ Đang đợi đối thủ...' : '⚔️ Đề nghị đấu lại'}
+                </button>
+                <button
+                  className="btn-secondary btn-sm full-width mt-2"
+                  onClick={handleLeaveOnlineRoom}
+                >
+                  🚪 Rời phòng đấu
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
