@@ -36,10 +36,9 @@ export interface RoomConfig {
 }
 
 export interface P2PCallbacks {
-  onRoomCreated?: (roomCode: string) => void;
-  onRoomJoined?: (roomCode: string) => void;
+  onPeerReady?: (myPeerId: string) => void;
   onConnected?: (peerName: string) => void;
-  onRoomInfo?: (info: { roomCode: string; hostName: string; timeControl?: string; hostSide?: string }) => void;
+  onRoomInfo?: (info: { roomCode: string; hostName: string }) => void;
   onDisconnected?: () => void;
   onMoveReceived?: (move: Move, nextTurn: Side, remainingTime?: { red: number; black: number }) => void;
   onGameStart?: (config: { mySide: Side; timeControl: string; opponentName: string; roomCode: string }) => void;
@@ -59,15 +58,6 @@ export interface P2PCallbacks {
 
 const PEER_PREFIX = 'cotuong-p2p-';
 
-const ICE_SERVERS = [
-  { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: 'stun:stun2.l.google.com:19302' },
-  { urls: 'stun:stun3.l.google.com:19302' },
-  { urls: 'stun:stun4.l.google.com:19302' },
-  { urls: 'stun:stun.cloudflare.com:3478' },
-];
-
 export class P2PService {
   private peer: Peer | null = null;
   private conn: DataConnection | null = null;
@@ -76,35 +66,41 @@ export class P2PService {
   private currentRoomCode: string = '';
   private myName: string = 'Kỳ Thủ';
   private pingInterval: any = null;
-  private isHostRole: boolean = false;
 
   constructor() {
     // Peer will be initialized on demand
   }
 
-  /**
-   * Host creates a new room with a random 6-character room code.
-   */
-  public createRoom(playerName: string, callbacks: P2PCallbacks): Promise<string> {
-    this.myName = playerName || 'Chủ Phòng';
+  public init(playerName: string, callbacks: P2PCallbacks): Promise<string> {
+    this.myName = playerName || 'Kỳ Thủ';
     this.callbacks = callbacks;
-    this.isHostRole = true;
 
     return new Promise((resolve, reject) => {
       try {
-        this.cleanup();
+        if (this.peer && !this.peer.destroyed) {
+          this.peer.destroy();
+        }
 
-        const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-        this.currentRoomCode = randomCode;
-
-        this.peer = new Peer(`${PEER_PREFIX}${randomCode}`, {
+        // Initialize Peer with random id or prefix
+        const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+        this.peer = new Peer(`${PEER_PREFIX}${randomId}`, {
           debug: 1,
-          config: { iceServers: ICE_SERVERS },
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              { urls: 'stun:stun1.l.google.com:19302' },
+              { urls: 'stun:stun2.l.google.com:19302' },
+              { urls: 'stun:stun3.l.google.com:19302' },
+              { urls: 'stun:stun4.l.google.com:19302' },
+              { urls: 'stun:stun.cloudflare.com:3478' },
+            ],
+          },
         });
 
         this.peer.on('open', (id) => {
           this.myPeerId = id.replace(PEER_PREFIX, '');
-          this.callbacks.onRoomCreated?.(this.myPeerId);
+          this.currentRoomCode = this.myPeerId;
+          this.callbacks.onPeerReady?.(this.myPeerId);
           resolve(this.myPeerId);
         });
 
@@ -113,72 +109,10 @@ export class P2PService {
         });
 
         this.peer.on('error', (err: any) => {
-          console.error('[P2P CreateRoom Error]', err);
-          this.callbacks.onError?.(err?.message || 'Lỗi khi tạo phòng P2P');
-          reject(err);
-        });
-      } catch (e: any) {
-        reject(e);
-      }
-    });
-  }
-
-  /**
-   * Guest joins an existing room using the host's room code.
-   */
-  public joinRoom(roomCode: string, playerName: string, callbacks: P2PCallbacks): Promise<void> {
-    this.myName = playerName || 'Kỳ Thủ Khách';
-    this.callbacks = callbacks;
-    this.isHostRole = false;
-
-    const cleanCode = roomCode.trim().replace(/^cotuong-p2p-/i, '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-    this.currentRoomCode = cleanCode;
-    const targetPeerId = `${PEER_PREFIX}${cleanCode}`;
-
-    return new Promise((resolve, reject) => {
-      try {
-        this.cleanup();
-
-        // Guest creates an ephemeral client peer
-        const guestRandomId = `GUEST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-        this.peer = new Peer(`${PEER_PREFIX}${guestRandomId}`, {
-          debug: 1,
-          config: { iceServers: ICE_SERVERS },
-        });
-
-        this.peer.on('open', () => {
-          if (!this.peer || this.peer.destroyed) {
-            return reject(new Error('Peer client không hợp lệ'));
-          }
-
-          const connection = this.peer.connect(targetPeerId, {
-            reliable: true,
-          });
-
-          connection.on('open', () => {
-            this.setupConnection(connection);
-            // Send JOIN message to host
-            this.sendMessage({
-              type: 'JOIN_ROOM',
-              senderName: this.myName,
-              timestamp: Date.now(),
-            });
-            this.callbacks.onRoomJoined?.(cleanCode);
-            resolve();
-          });
-
-          connection.on('error', (err: any) => {
-            console.error('[P2P Join Connection Error]', err);
-            this.callbacks.onError?.(`Không thể kết nối đến phòng [${cleanCode}]. Vui lòng kiểm tra lại mã phòng!`);
-            reject(err);
-          });
-        });
-
-        this.peer.on('error', (err: any) => {
-          console.error('[P2P Join Peer Error]', err);
+          console.error('[P2P Error]', err);
           if (err?.type === 'peer-unavailable') {
             this.callbacks.onError?.(
-              `Không tìm thấy phòng [${cleanCode}]. Vui lòng đảm bảo chủ phòng đã bấm "Tạo Phòng" và phòng đang mở!`
+              `Không tìm thấy phòng [${this.currentRoomCode}]. Vui lòng đảm bảo chủ phòng đã bấm "Tạo Phòng" và phòng đang mở!`
             );
           } else {
             this.callbacks.onError?.(err?.message || 'Lỗi kết nối mạng P2P');
@@ -192,11 +126,41 @@ export class P2PService {
   }
 
   public getMyRoomCode(): string {
-    return this.currentRoomCode || this.myPeerId;
+    return this.myPeerId;
   }
 
-  public isHost(): boolean {
-    return this.isHostRole;
+  public joinRoom(roomCode: string, playerName: string): Promise<void> {
+    this.myName = playerName || 'Kỳ Thủ Khách';
+    const cleanCode = roomCode.trim().replace(/^cotuong-p2p-/i, '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    this.currentRoomCode = cleanCode;
+    const targetPeerId = `${PEER_PREFIX}${cleanCode}`;
+
+    return new Promise((resolve, reject) => {
+      if (!this.peer || this.peer.destroyed) {
+        return reject(new Error('Peer chưa được khởi tạo'));
+      }
+
+      const connection = this.peer.connect(targetPeerId, {
+        reliable: true,
+      });
+
+      connection.on('open', () => {
+        this.setupConnection(connection);
+        // Send JOIN message to host
+        this.sendMessage({
+          type: 'JOIN_ROOM',
+          senderName: this.myName,
+          timestamp: Date.now(),
+        });
+        resolve();
+      });
+
+      connection.on('error', (err: any) => {
+        console.error('[P2P Connection Error]', err);
+        this.callbacks.onError?.(`Không thể kết nối đến phòng [${cleanCode}]. Vui lòng kiểm tra lại mã phòng!`);
+        reject(err);
+      });
+    });
   }
 
   public startGameAsHost(config: RoomConfig) {
@@ -208,7 +172,7 @@ export class P2PService {
     }
 
     const guestSide: Side = hostAssignedSide === 'red' ? 'black' : 'red';
-    const roomCode = config.roomId || this.currentRoomCode;
+    const roomCode = config.roomId || this.myPeerId;
 
     // Tell guest to start game
     this.sendMessage({
@@ -375,7 +339,7 @@ export class P2PService {
           senderName: this.myName,
           timestamp: Date.now(),
           payload: {
-            roomCode: this.currentRoomCode,
+            roomCode: this.myPeerId,
             hostName: this.myName,
           },
         });
@@ -487,7 +451,7 @@ export class P2PService {
     }
   }
 
-  private cleanup() {
+  public disconnect() {
     this.stopHeartbeat();
     if (this.conn) {
       this.conn.close();
@@ -497,10 +461,6 @@ export class P2PService {
       this.peer.destroy();
       this.peer = null;
     }
-  }
-
-  public disconnect() {
-    this.cleanup();
   }
 }
 

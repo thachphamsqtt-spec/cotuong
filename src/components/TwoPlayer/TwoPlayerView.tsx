@@ -297,20 +297,8 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
   // ==========================================
   const setupP2PCallbacks = () => {
     return {
-      onRoomCreated: (code: string) => {
+      onPeerReady: (code: string) => {
         setMyRoomCode(code);
-        setCurrentOnlineRoomCode(code);
-        setIsHosting(true);
-        setIsGuestJoined(false);
-        setIsConnecting(false);
-        setOnlineStatusMessage(`Đã tạo phòng [${code}]! Hãy gửi link hoặc mã phòng cho bạn bè.`);
-      },
-      onRoomJoined: (code: string) => {
-        setCurrentOnlineRoomCode(code);
-        setIsGuestJoined(true);
-        setIsHosting(false);
-        setIsConnecting(false);
-        setOnlineStatusMessage(`Đã kết nối tới phòng [${code}]! Đang chờ chủ phòng bắt đầu ván đấu...`);
       },
       onConnected: (peerName: string) => {
         setOpponentName(peerName || 'Kỳ Thủ');
@@ -324,7 +312,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
         setIsGuestJoined(true);
         setIsHosting(false);
         setIsConnecting(false);
-        setOnlineStatusMessage(`🟢 Đã vào phòng [${info.roomCode}] của [${info.hostName}]!`);
+        setOnlineStatusMessage(`🟢 Đã vào phòng [${info.roomCode}] của [${info.hostName}]! Đang chờ chủ phòng bắt đầu...`);
       },
       onDisconnected: () => {
         setOnlineStatusMessage('Đối thủ đã rời phòng hoặc mất kết nối mạng.');
@@ -452,11 +440,18 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
 
   const handleCreateRoom = async () => {
     setIsConnecting(true);
+    setIsHosting(true);
+    setIsGuestJoined(false);
     setOnlineStatusMessage('Đang khởi tạo máy chủ phòng...');
     try {
-      await p2pService.createRoom(playerName, setupP2PCallbacks());
+      const code = await p2pService.init(playerName, setupP2PCallbacks());
+      setMyRoomCode(code);
+      setCurrentOnlineRoomCode(code);
+      setIsConnecting(false);
+      setOnlineStatusMessage(`Đã tạo phòng [${code}]! Hãy gửi link hoặc mã phòng cho bạn bè.`);
     } catch (e: any) {
       setOnlineStatusMessage('Không thể tạo phòng, vui lòng thử lại.');
+      setIsHosting(false);
       setIsConnecting(false);
     }
   };
@@ -474,13 +469,20 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     if (!joinCodeInput.trim()) return;
     const clean = joinCodeInput.trim().replace(/^cotuong-p2p-/i, '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
     setIsConnecting(true);
+    setIsHosting(false);
     setOnlineStatusMessage(`Đang tìm và kết nối tới phòng [${clean}]...`);
 
     try {
-      await p2pService.joinRoom(clean, playerName, setupP2PCallbacks());
+      await p2pService.init(playerName, setupP2PCallbacks());
+      setCurrentOnlineRoomCode(clean);
+      await p2pService.joinRoom(clean, playerName);
+      setIsGuestJoined(true);
+      setIsConnecting(false);
+      setOnlineStatusMessage(`🟢 Đã kết nối tới phòng [${clean}]! Đang chờ chủ phòng bắt đầu trận đấu...`);
     } catch (e: any) {
       setOnlineStatusMessage(`Không thể kết nối vào phòng [${clean}]. Vui lòng kiểm tra lại mã.`);
       setIsConnecting(false);
+      setIsGuestJoined(false);
     }
   };
 
@@ -493,16 +495,19 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
   };
 
   const handleLeaveOnlineRoom = () => {
-    if (window.confirm('Bạn có chắc chắn muốn rời phòng đấu trực tuyến?')) {
-      p2pService.disconnect();
-      setOnlineGameActive(false);
-      setIsHosting(false);
-      setIsGuestJoined(false);
-      setCurrentOnlineRoomCode('');
-      setMyRoomCode('');
-      setOnlineGameOverModal(null);
-      setOnlineStatusMessage('Đã rời phòng đấu.');
+    if (onlineGameActive) {
+      if (!window.confirm('Bạn có chắc chắn muốn rời phòng đấu trực tuyến?')) return;
     }
+    p2pService.disconnect();
+    setOnlineGameActive(false);
+    setIsHosting(false);
+    setIsGuestJoined(false);
+    setCurrentOnlineRoomCode('');
+    setMyRoomCode('');
+    setRoomHostName('');
+    setOpponentName('Đối Thủ');
+    setOnlineGameOverModal(null);
+    setOnlineStatusMessage('Đã rời phòng đấu.');
   };
 
   const handleOnlineSquareClick = (sq: Square) => {
@@ -871,6 +876,9 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
                         </button>
                         <button className="btn-primary full-width mt-2" onClick={handleStartGameAsHost}>
                           🚀 Bắt đầu ván đấu
+                        </button>
+                        <button className="btn-secondary btn-sm full-width mt-2" onClick={handleLeaveOnlineRoom}>
+                          ✕ Hủy / Đóng phòng
                         </button>
                       </div>
                     )}
