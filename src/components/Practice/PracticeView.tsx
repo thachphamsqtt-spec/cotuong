@@ -15,13 +15,14 @@ import { XiangqiBoard, PieceSet } from '../Board/XiangqiBoard';
 import { Square } from '../../core/types';
 import { soundEffects } from '../../audio/soundFX';
 import { generateLegalMoves } from '../../core/gameEngine';
+import { PuzzleRushView } from './PuzzleRushView';
 
 interface PracticeViewProps {
   pieceSet: PieceSet;
 }
 
 export const PracticeView: React.FC<PracticeViewProps> = ({ pieceSet }) => {
-  const [mode, setMode] = useState<'puzzles' | 'streak' | 'daily'>('puzzles');
+  const [mode, setMode] = useState<'puzzles' | 'rush' | 'streak' | 'daily'>('puzzles');
   const [puzzleIndex, setPuzzleIndex] = useState<number>(0);
   const [session, setSession] = useState<PuzzleSessionState>(() =>
     createPuzzleSession(PUZZLES[0])
@@ -48,6 +49,7 @@ export const PracticeView: React.FC<PracticeViewProps> = ({ pieceSet }) => {
   }, []);
 
   useEffect(() => {
+    if (mode === 'rush') return;
     let puz: Puzzle;
     if (mode === 'daily') {
       puz = getDailyPuzzle();
@@ -282,6 +284,12 @@ export const PracticeView: React.FC<PracticeViewProps> = ({ pieceSet }) => {
           🧩 Kho Thế Cờ
         </button>
         <button
+          className={`tab-btn rush-tab-btn ${mode === 'rush' ? 'active' : ''}`}
+          onClick={() => setMode('rush')}
+        >
+          ⚡ Đố Vui Tốc Độ (Rush)
+        </button>
+        <button
           className={`tab-btn ${mode === 'streak' ? 'active' : ''}`}
           onClick={() => setMode('streak')}
         >
@@ -295,22 +303,28 @@ export const PracticeView: React.FC<PracticeViewProps> = ({ pieceSet }) => {
         </button>
       </div>
 
-      <div className="practice-body">
-        {/* Board column */}
-        <div className="practice-board-col">
-          <XiangqiBoard
-            board={displayedBoard}
-            turn={showSolution ? undefined : session.puzzle.side}
-            selectedSquare={showSolution ? null : selectedSquare}
-            legalMoves={legalMoves}
-            pieceSet={pieceSet}
-            highlights={displayedHighlights}
-            arrows={displayedArrows}
-            interactive={!showSolution && !isOpponentThinking}
-            onSquareClick={handleSquareClick}
-            onMove={handleMove}
-          />
-        </div>
+      {mode === 'rush' ? (
+        <PuzzleRushView
+          pieceSet={pieceSet}
+          onBackToNormalPractice={() => setMode('puzzles')}
+        />
+      ) : (
+        <div className="practice-body">
+          {/* Board column */}
+          <div className="practice-board-col">
+            <XiangqiBoard
+              board={displayedBoard}
+              turn={showSolution ? undefined : session.puzzle.side}
+              selectedSquare={showSolution ? null : selectedSquare}
+              legalMoves={legalMoves}
+              pieceSet={pieceSet}
+              highlights={displayedHighlights}
+              arrows={displayedArrows}
+              interactive={!showSolution && !isOpponentThinking}
+              onSquareClick={handleSquareClick}
+              onMove={handleMove}
+            />
+          </div>
 
         {/* Puzzle info column */}
         <div className="practice-info-col">
@@ -469,6 +483,7 @@ export const PracticeView: React.FC<PracticeViewProps> = ({ pieceSet }) => {
           </div>
         </div>
       </div>
-    </div>
+    )}
+  </div>
   );
 };
