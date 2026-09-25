@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { XiangqiGame } from '../../core/gameEngine';
 import { Board, Move, Side, Square } from '../../core/types';
 import { toVietnameseNotation } from '../../core/vietnameseNotation';
 import { soundEffects } from '../../audio/soundFX';
 import { XiangqiBoard, PieceSet } from '../Board/XiangqiBoard';
 import { parseSquare } from '../../core/board';
-import { p2pService } from '../../services/p2pService';
+import { p2pService, P2PCallbacks } from '../../services/p2pService';
 import { exportToPGN } from '../../core/pgn';
+import { INITIAL_FEN } from '../../core/fen';
 
 interface TwoPlayerViewProps {
   pieceSet: PieceSet;
@@ -151,6 +152,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
           if (prev <= 1) {
             clearInterval(timer);
             const winner = mySide === 'red' ? 'Đối thủ' : 'Bạn';
+            soundEffects.playDefeat();
             setOnlineGameOverModal({
               show: true,
               title: 'HẾT GIỜ!',
@@ -158,6 +160,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
             });
             return 0;
           }
+          if (prev === 30 || prev === 10) soundEffects.playCheck();
           return prev - 1;
         });
       } else {
@@ -165,6 +168,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
           if (prev <= 1) {
             clearInterval(timer);
             const winner = mySide === 'black' ? 'Đối thủ' : 'Bạn';
+            soundEffects.playDefeat();
             setOnlineGameOverModal({
               show: true,
               title: 'HẾT GIỜ!',
@@ -172,13 +176,14 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
             });
             return 0;
           }
+          if (prev === 30 || prev === 10) soundEffects.playCheck();
           return prev - 1;
         });
       }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [onlineGameActive, onlineGame, onlineGameOverModal, onlineTimeControl, mySide]);
+  }, [onlineGameActive, onlineGame, onlineGameOverModal, onlineTimeControl, mySide, onlineMoveHistory]);
 
   // --- Format Seconds to MM:SS ---
   const formatTime = (secs: number) => {
@@ -292,150 +297,193 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     });
   };
 
-  // ==========================================
-  // ONLINE P2P WEBRTC LOGIC
-  // ==========================================
-  const setupP2PCallbacks = () => {
-    return {
-      onPeerReady: (code: string) => {
-        setMyRoomCode(code);
-      },
-      onConnected: (peerName: string) => {
-        setOpponentName(peerName || 'Kỳ Thủ');
-        setIsConnecting(false);
-        setOnlineStatusMessage(`🟢 Đã kết nối với [${peerName}]!`);
-      },
-      onRoomInfo: (info: { roomCode: string; hostName: string }) => {
-        setCurrentOnlineRoomCode(info.roomCode);
-        setRoomHostName(info.hostName);
-        setOpponentName(info.hostName);
-        setIsGuestJoined(true);
-        setIsHosting(false);
-        setIsConnecting(false);
-        setOnlineStatusMessage(`🟢 Đã vào phòng [${info.roomCode}] của [${info.hostName}]! Đang chờ chủ phòng bắt đầu...`);
-      },
-      onDisconnected: () => {
-        setOnlineStatusMessage('Đối thủ đã rời phòng hoặc mất kết nối mạng.');
+  // Reference to always hold the latest online game instance for callbacks & event handlers
+  const onlineGameRef = useRef<XiangqiGame>(onlineGame);
+  useEffect(() => {
+    onlineGameRef.current = onlineGame;
+  }, [onlineGame]);
+
+  const callbacksRef = useRef<P2PCallbacks>({});
+
+  // Proxy callbacks that always dispatch to current callbacksRef
+  const proxyCallbacks = useMemo<P2PCallbacks>(() => ({
+    onPeerReady: (...args) => callbacksRef.current.onPeerReady?.(...args),
+    onConnected: (...args) => callbacksRef.current.onConnected?.(...args),
+    onRoomInfo: (...args) => callbacksRef.current.onRoomInfo?.(...args),
+    onDisconnected: (...args) => callbacksRef.current.onDisconnected?.(...args),
+    onMoveReceived: (...args) => callbacksRef.current.onMoveReceived?.(...args),
+    onGameStart: (...args) => callbacksRef.current.onGameStart?.(...args),
+    onDrawOffered: (...args) => callbacksRef.current.onDrawOffered?.(...args),
+    onDrawAccepted: (...args) => callbacksRef.current.onDrawAccepted?.(...args),
+    onDrawRejected: (...args) => callbacksRef.current.onDrawRejected?.(...args),
+    onUndoOffered: (...args) => callbacksRef.current.onUndoOffered?.(...args),
+    onUndoAccepted: (...args) => callbacksRef.current.onUndoAccepted?.(...args),
+    onUndoRejected: (...args) => callbacksRef.current.onUndoRejected?.(...args),
+    onOpponentResigned: (...args) => callbacksRef.current.onOpponentResigned?.(...args),
+    onRematchRequested: (...args) => callbacksRef.current.onRematchRequested?.(...args),
+    onRematchAccepted: (...args) => callbacksRef.current.onRematchAccepted?.(...args),
+    onChatMessage: (...args) => callbacksRef.current.onChatMessage?.(...args),
+    onEmojiReceived: (...args) => callbacksRef.current.onEmojiReceived?.(...args),
+    onError: (...args) => callbacksRef.current.onError?.(...args),
+  }), []);
+
+  // Update callbacksRef on every render to eliminate stale closures
+  callbacksRef.current = {
+    onPeerReady: (code: string) => {
+      setMyRoomCode(code);
+    },
+    onConnected: (peerName: string) => {
+      setOpponentName(peerName || 'Kỳ Thủ');
+      setIsConnecting(false);
+      setOnlineStatusMessage(`🟢 Đã kết nối với [${peerName}]!`);
+    },
+    onRoomInfo: (info: { roomCode: string; hostName: string }) => {
+      setCurrentOnlineRoomCode(info.roomCode);
+      setRoomHostName(info.hostName);
+      setOpponentName(info.hostName);
+      setIsGuestJoined(true);
+      setIsHosting(false);
+      setIsConnecting(false);
+      setOnlineStatusMessage(`🟢 Đã vào phòng [${info.roomCode}] của [${info.hostName}]! Đang chờ chủ phòng bắt đầu...`);
+    },
+    onDisconnected: () => {
+      setOnlineStatusMessage('Đối thủ đã rời phòng hoặc mất kết nối mạng.');
+      setOnlineGameOverModal({
+        show: true,
+        title: 'MẤT KẾT NỐI',
+        reason: 'Đối thủ đã ngắt kết nối khỏi ván đấu.',
+      });
+    },
+    onGameStart: (config: { mySide: Side; timeControl: string; opponentName: string; roomCode: string; initialFen?: string }) => {
+      setMySide(config.mySide);
+      setOpponentName(config.opponentName);
+      if (config.roomCode) {
+        setCurrentOnlineRoomCode(config.roomCode);
+      }
+      const newG = new XiangqiGame(config.initialFen || INITIAL_FEN);
+      onlineGameRef.current = newG;
+      setOnlineGame(newG);
+      initialOnlineBoardRef.current = newG.getBoard();
+      setOnlineGameActive(true);
+      setOnlineMoveHistory([]);
+      setOnlineSelectedSquare(null);
+      setOnlineGameOverModal(null);
+
+      const initialSecs =
+        config.timeControl === '5m' ? 300 : config.timeControl === '10m' ? 600 : config.timeControl === '15m' ? 900 : 0;
+      setOnlineRedTime(initialSecs);
+      setOnlineBlackTime(initialSecs);
+      setOnlineTimeControl(config.timeControl as any);
+      soundEffects.playVictory();
+    },
+    onMoveReceived: (move: Move, _nextTurn: Side, remainingTime?: { red: number; black: number }, fen?: string) => {
+      const currentGame = onlineGameRef.current;
+      const prevBoard = currentGame.getBoard();
+      const isCapture = Boolean(prevBoard[parseSquare(move.to).row][parseSquare(move.to).col]);
+      const notation = toVietnameseNotation(prevBoard, move, notationFormat);
+
+      const res = currentGame.makeMove(move.from, move.to);
+      let newGame: XiangqiGame;
+      if (res.success) {
+        newGame = new XiangqiGame(currentGame.getFEN());
+      } else if (fen) {
+        newGame = new XiangqiGame(fen);
+      } else {
+        newGame = currentGame;
+      }
+
+      onlineGameRef.current = newGame;
+      setOnlineGame(newGame);
+      setOnlineMoveHistory((prev) => [...prev, { notation, move }]);
+      setOnlineSelectedSquare(null);
+
+      if (remainingTime) {
+        setOnlineRedTime(remainingTime.red);
+        setOnlineBlackTime(remainingTime.black);
+      }
+
+      const currentStatus = newGame.getStatus();
+      if (currentStatus === 'stalemate' || currentStatus === 'loss_perpetual_check') {
+        soundEffects.playDefeat();
         setOnlineGameOverModal({
           show: true,
-          title: 'MẤT KẾT NỐI',
-          reason: 'Đối thủ đã ngắt kết nối khỏi ván đấu.',
+          title: 'THUA CUỘC!',
+          reason: 'Đối thủ đã tung đòn kết liễu trận đấu!',
         });
-      },
-      onGameStart: (config: { mySide: Side; timeControl: string; opponentName: string; roomCode: string }) => {
-        setMySide(config.mySide);
-        setOpponentName(config.opponentName);
-        if (config.roomCode) {
-          setCurrentOnlineRoomCode(config.roomCode);
-        }
-        const newG = new XiangqiGame();
-        setOnlineGame(newG);
-        initialOnlineBoardRef.current = newG.getBoard();
-        setOnlineGameActive(true);
-        setOnlineMoveHistory([]);
-        setOnlineSelectedSquare(null);
-        setOnlineGameOverModal(null);
-
-        const initialSecs =
-          config.timeControl === '5m' ? 300 : config.timeControl === '10m' ? 600 : config.timeControl === '15m' ? 900 : 0;
-        setOnlineRedTime(initialSecs);
-        setOnlineBlackTime(initialSecs);
-        soundEffects.playVictory();
-      },
-      onMoveReceived: (move: Move, _nextTurn: Side, remainingTime?: { red: number; black: number }) => {
-        const prevBoard = onlineGame.getBoard();
-        const isCapture = Boolean(prevBoard[parseSquare(move.to).row][parseSquare(move.to).col]);
-        const notation = toVietnameseNotation(prevBoard, move, notationFormat);
-
-        const res = onlineGame.makeMove(move.from, move.to);
-        if (res.success) {
-          setOnlineMoveHistory((prev) => [...prev, { notation, move }]);
-          setOnlineSelectedSquare(null);
-
-          if (remainingTime) {
-            setOnlineRedTime(remainingTime.red);
-            setOnlineBlackTime(remainingTime.black);
-          }
-
-          if (res.status === 'stalemate' || res.status === 'loss_perpetual_check') {
-            soundEffects.playDefeat();
-            setOnlineGameOverModal({
-              show: true,
-              title: 'THUA CUỘC!',
-              reason: 'Đối thủ đã tung đòn kết liễu trận đấu!',
-            });
-          } else if (res.status === 'check') {
-            soundEffects.playCheck();
-          } else if (isCapture) {
-            soundEffects.playCapture();
-          } else {
-            soundEffects.playMove();
-          }
-        }
-      },
-      onDrawOffered: () => {
-        setIncomingDrawOffer(true);
-      },
-      onDrawAccepted: () => {
-        setOnlineGameOverModal({
-          show: true,
-          title: 'HÒA CỜ',
-          reason: 'Hai kỳ thủ đã đồng ý ký hòa ván đấu.',
-        });
-      },
-      onDrawRejected: () => {
-        alert('Đối thủ không đồng ý hòa cờ!');
-      },
-      onUndoOffered: () => {
-        setIncomingUndoOffer(true);
-      },
-      onUndoAccepted: () => {
-        onlineGame.undo();
-        setOnlineMoveHistory((prev) => prev.slice(0, -1));
-        setOnlineSelectedSquare(null);
-      },
-      onUndoRejected: () => {
-        alert('Đối thủ không đồng ý cho hoãn nước cờ!');
-      },
-      onOpponentResigned: () => {
-        soundEffects.playVictory();
-        setOnlineGameOverModal({
-          show: true,
-          title: 'CHIẾN THẮNG!',
-          reason: `${opponentName} đã xin đầu hàng. Bạn giành chiến thắng!`,
-        });
-      },
-      onRematchRequested: () => {
-        setIncomingRematchOffer(true);
-      },
-      onRematchAccepted: () => {
-        // Swap sides and restart
-        const nextSide: Side = mySide === 'red' ? 'black' : 'red';
-        setMySide(nextSide);
-        const newG = new XiangqiGame();
-        setOnlineGame(newG);
-        initialOnlineBoardRef.current = newG.getBoard();
-        setOnlineMoveHistory([]);
-        setOnlineSelectedSquare(null);
-        setOnlineGameOverModal(null);
-        const initialSecs =
-          onlineTimeControl === '5m' ? 300 : onlineTimeControl === '10m' ? 600 : onlineTimeControl === '15m' ? 900 : 0;
-        setOnlineRedTime(initialSecs);
-        setOnlineBlackTime(initialSecs);
-      },
-      onChatMessage: (sender: string, text: string) => {
-        const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        setOnlineChatMessages((prev) => [...prev, { sender, text, time: timeStr }]);
-      },
-      onEmojiReceived: (sender: string, emoji: string) => {
-        setRecentEmojiReaction({ sender, emoji });
-        setTimeout(() => setRecentEmojiReaction(null), 3000);
-      },
-      onError: (err: string) => {
-        setOnlineStatusMessage(`⚠️ ${err}`);
-        setIsConnecting(false);
-      },
-    };
+      } else if (currentStatus === 'check') {
+        soundEffects.playCheck();
+      } else if (isCapture) {
+        soundEffects.playCapture();
+      } else {
+        soundEffects.playMove();
+      }
+    },
+    onDrawOffered: () => {
+      setIncomingDrawOffer(true);
+    },
+    onDrawAccepted: () => {
+      setOnlineGameOverModal({
+        show: true,
+        title: 'HÒA CỜ',
+        reason: 'Hai kỳ thủ đã đồng ý ký hòa ván đấu.',
+      });
+    },
+    onDrawRejected: () => {
+      alert('Đối thủ không đồng ý hòa cờ!');
+    },
+    onUndoOffered: () => {
+      setIncomingUndoOffer(true);
+    },
+    onUndoAccepted: () => {
+      const currentGame = onlineGameRef.current;
+      currentGame.undo();
+      const newGame = new XiangqiGame(currentGame.getFEN());
+      onlineGameRef.current = newGame;
+      setOnlineGame(newGame);
+      setOnlineMoveHistory((prev) => prev.slice(0, -1));
+      setOnlineSelectedSquare(null);
+    },
+    onUndoRejected: () => {
+      alert('Đối thủ không đồng ý cho hoãn nước cờ!');
+    },
+    onOpponentResigned: () => {
+      soundEffects.playVictory();
+      setOnlineGameOverModal({
+        show: true,
+        title: 'CHIẾN THẮNG!',
+        reason: `${opponentName} đã xin đầu hàng. Bạn giành chiến thắng!`,
+      });
+    },
+    onRematchRequested: () => {
+      setIncomingRematchOffer(true);
+    },
+    onRematchAccepted: () => {
+      const nextSide: Side = mySide === 'red' ? 'black' : 'red';
+      setMySide(nextSide);
+      const newG = new XiangqiGame();
+      onlineGameRef.current = newG;
+      setOnlineGame(newG);
+      initialOnlineBoardRef.current = newG.getBoard();
+      setOnlineMoveHistory([]);
+      setOnlineSelectedSquare(null);
+      setOnlineGameOverModal(null);
+      const initialSecs =
+        onlineTimeControl === '5m' ? 300 : onlineTimeControl === '10m' ? 600 : onlineTimeControl === '15m' ? 900 : 0;
+      setOnlineRedTime(initialSecs);
+      setOnlineBlackTime(initialSecs);
+    },
+    onChatMessage: (sender: string, text: string) => {
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setOnlineChatMessages((prev) => [...prev, { sender, text, time: timeStr }]);
+    },
+    onEmojiReceived: (sender: string, emoji: string) => {
+      setRecentEmojiReaction({ sender, emoji });
+      setTimeout(() => setRecentEmojiReaction(null), 3000);
+    },
+    onError: (err: string) => {
+      setOnlineStatusMessage(`⚠️ ${err}`);
+      setIsConnecting(false);
+    },
   };
 
   const handleCreateRoom = async () => {
@@ -444,7 +492,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     setIsGuestJoined(false);
     setOnlineStatusMessage('Đang khởi tạo máy chủ phòng...');
     try {
-      const code = await p2pService.init(playerName, setupP2PCallbacks());
+      const code = await p2pService.init(playerName, proxyCallbacks);
       setMyRoomCode(code);
       setCurrentOnlineRoomCode(code);
       setIsConnecting(false);
@@ -473,7 +521,7 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     setOnlineStatusMessage(`Đang tìm và kết nối tới phòng [${clean}]...`);
 
     try {
-      await p2pService.init(playerName, setupP2PCallbacks());
+      await p2pService.init(playerName, proxyCallbacks);
       setCurrentOnlineRoomCode(clean);
       await p2pService.joinRoom(clean, playerName);
       setIsGuestJoined(true);
@@ -513,11 +561,11 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
   const handleOnlineSquareClick = (sq: Square) => {
     if (!onlineGameActive || onlineGameOverModal?.show) return;
 
-    // Must be player's turn
-    const turn = onlineGame.getTurn();
+    const currentGame = onlineGameRef.current;
+    const turn = currentGame.getTurn();
     if (turn !== mySide) return;
 
-    const board = onlineGame.getBoard();
+    const board = currentGame.getBoard();
     const { row, col } = parseSquare(sq);
     const piece = board[row][col];
 
@@ -541,25 +589,33 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({
     }
 
     // Try move
-    const legal = onlineGame.getLegalMoves();
+    const legal = currentGame.getLegalMoves();
     const targetMove = legal.find((m) => m.from === onlineSelectedSquare && m.to === sq);
 
     if (targetMove) {
       const isCapture = Boolean(board[parseSquare(sq).row][parseSquare(sq).col]);
-      const prevBoard = onlineGame.getBoard();
+      const prevBoard = currentGame.getBoard();
       const nextTurn = mySide === 'red' ? 'black' : 'red';
       const notation = toVietnameseNotation(prevBoard, targetMove, notationFormat);
 
-      const res = onlineGame.makeMove(targetMove.from, targetMove.to);
+      const res = currentGame.makeMove(targetMove.from, targetMove.to);
       if (res.success) {
+        const newGame = new XiangqiGame(currentGame.getFEN());
+        onlineGameRef.current = newGame;
+        setOnlineGame(newGame);
         setOnlineMoveHistory((prev) => [...prev, { notation, move: targetMove }]);
         setOnlineSelectedSquare(null);
 
-        // Send move via P2P
-        p2pService.sendMove(targetMove, nextTurn, {
-          red: onlineRedTime,
-          black: onlineBlackTime,
-        });
+        // Send move via P2P with remaining time & current FEN
+        p2pService.sendMove(
+          targetMove,
+          nextTurn,
+          {
+            red: onlineRedTime,
+            black: onlineBlackTime,
+          },
+          newGame.getFEN()
+        );
 
         if (res.status === 'stalemate' || res.status === 'loss_perpetual_check') {
           soundEffects.playVictory();

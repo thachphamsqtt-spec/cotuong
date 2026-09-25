@@ -40,8 +40,8 @@ export interface P2PCallbacks {
   onConnected?: (peerName: string) => void;
   onRoomInfo?: (info: { roomCode: string; hostName: string }) => void;
   onDisconnected?: () => void;
-  onMoveReceived?: (move: Move, nextTurn: Side, remainingTime?: { red: number; black: number }) => void;
-  onGameStart?: (config: { mySide: Side; timeControl: string; opponentName: string; roomCode: string }) => void;
+  onMoveReceived?: (move: Move, nextTurn: Side, remainingTime?: { red: number; black: number }, fen?: string) => void;
+  onGameStart?: (config: { mySide: Side; timeControl: string; opponentName: string; roomCode: string; initialFen?: string }) => void;
   onDrawOffered?: () => void;
   onDrawAccepted?: () => void;
   onDrawRejected?: () => void;
@@ -65,10 +65,15 @@ export class P2PService {
   private myPeerId: string = '';
   private currentRoomCode: string = '';
   private myName: string = 'Kỳ Thủ';
+  private opponentPlayerName: string = 'Đối Thủ';
   private pingInterval: any = null;
 
   constructor() {
     // Peer will be initialized on demand
+  }
+
+  public setCallbacks(callbacks: P2PCallbacks) {
+    this.callbacks = callbacks;
   }
 
   public init(playerName: string, callbacks: P2PCallbacks): Promise<string> {
@@ -144,18 +149,32 @@ export class P2PService {
         reliable: true,
       });
 
-      connection.on('open', () => {
-        this.setupConnection(connection);
-        // Send JOIN message to host
+      this.setupConnection(connection);
+
+      const timeout = setTimeout(() => {
+        if (!connection.open) {
+          reject(new Error(`Hết thời gian kết nối tới phòng [${cleanCode}]`));
+        }
+      }, 15000);
+
+      const sendJoin = () => {
+        clearTimeout(timeout);
         this.sendMessage({
           type: 'JOIN_ROOM',
           senderName: this.myName,
           timestamp: Date.now(),
         });
         resolve();
-      });
+      };
+
+      if (connection.open) {
+        sendJoin();
+      } else {
+        connection.on('open', sendJoin);
+      }
 
       connection.on('error', (err: any) => {
+        clearTimeout(timeout);
         console.error('[P2P Connection Error]', err);
         this.callbacks.onError?.(`Không thể kết nối đến phòng [${cleanCode}]. Vui lòng kiểm tra lại mã phòng!`);
         reject(err);
@@ -191,12 +210,12 @@ export class P2PService {
     this.callbacks.onGameStart?.({
       mySide: hostAssignedSide,
       timeControl: config.timeControl,
-      opponentName: this.conn?.metadata?.peerName || 'Đối Thủ',
+      opponentName: this.opponentPlayerName || 'Đối Thủ',
       roomCode,
     });
   }
 
-  public sendMove(move: Move, nextTurn: Side, remainingTime?: { red: number; black: number }) {
+  public sendMove(move: Move, nextTurn: Side, remainingTime?: { red: number; black: number }, fen?: string) {
     this.sendMessage({
       type: 'MOVE',
       senderName: this.myName,
@@ -205,6 +224,7 @@ export class P2PService {
         move,
         nextTurn,
         remainingTime,
+        fen,
       },
     });
   }
@@ -308,10 +328,16 @@ export class P2PService {
   private setupConnection(connection: DataConnection) {
     this.conn = connection;
 
-    connection.on('open', () => {
+    const onOpen = () => {
       this.callbacks.onConnected?.(connection.peer.replace(PEER_PREFIX, ''));
       this.startHeartbeat();
-    });
+    };
+
+    if (connection.open) {
+      onOpen();
+    } else {
+      connection.on('open', onOpen);
+    }
 
     connection.on('data', (raw: any) => {
       const msg = raw as P2PMessage;
@@ -332,6 +358,7 @@ export class P2PService {
   private handleIncomingMessage(msg: P2PMessage) {
     switch (msg.type) {
       case 'JOIN_ROOM':
+        this.opponentPlayerName = msg.senderName;
         this.callbacks.onConnected?.(msg.senderName);
         // Reply with host info and room code
         this.sendMessage({
@@ -346,6 +373,7 @@ export class P2PService {
         break;
 
       case 'HOST_ACK':
+        this.opponentPlayerName = msg.senderName;
         this.callbacks.onConnected?.(msg.senderName);
         this.callbacks.onRoomInfo?.({
           roomCode: msg.payload?.roomCode || this.currentRoomCode,
@@ -354,10 +382,11 @@ export class P2PService {
         break;
 
       case 'GAME_START':
+        this.opponentPlayerName = msg.senderName || msg.payload?.hostName || 'Chủ Phòng';
         this.callbacks.onGameStart?.({
           mySide: msg.payload.guestSide,
           timeControl: msg.payload.timeControl,
-          opponentName: msg.senderName,
+          opponentName: this.opponentPlayerName,
           roomCode: msg.payload.roomCode || this.currentRoomCode,
         });
         break;
@@ -366,7 +395,8 @@ export class P2PService {
         this.callbacks.onMoveReceived?.(
           msg.payload.move,
           msg.payload.nextTurn,
-          msg.payload.remainingTime
+          msg.payload.remainingTime,
+          msg.payload.fen
         );
         break;
 
