@@ -4904,6 +4904,71 @@ input:checked + .slider:before {
   margin-bottom: 8px;
 }
 
+/* Incoming Rematch Banner inside Game Over Modal */
+.incoming-rematch-banner {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(241, 196, 15, 0.08));
+  border: 2px solid var(--gold-accent);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin: 14px 0;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
+  animation: pulseGlowGold 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlowGold {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(212, 175, 55, 0.5);
+  }
+}
+
+.rematch-banner-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #1a1407;
+  background: var(--gold-gradient);
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.rematch-banner-text {
+  font-size: 0.95rem;
+  color: #ffffff;
+  line-height: 1.45;
+  margin-bottom: 12px !important;
+}
+
+.btn-rematch-accept {
+  background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+  border-color: #27ae60 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.35);
+}
+
+.btn-rematch-accept:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(46, 204, 113, 0.5);
+}
+
+.btn-rematch-waiting {
+  opacity: 0.85;
+  cursor: wait;
+  animation: pulseWaiting 1.5s infinite;
+}
+
+@keyframes pulseWaiting {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
 /* ==========================================================================
    RESPONSIVE & MOBILE UX OPTIMIZATIONS
    ========================================================================== */
