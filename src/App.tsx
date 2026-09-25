@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LearnView } from './components/Learn/LearnView';
+import { OpeningExplorerView } from './components/Openings/OpeningExplorerView';
 import { PracticeView } from './components/Practice/PracticeView';
 import { PlayView } from './components/Play/PlayView';
 import { TwoPlayerView } from './components/TwoPlayer/TwoPlayerView';
@@ -11,7 +12,7 @@ import { Board, Move } from './core/types';
 import { soundEffects } from './audio/soundFX';
 import { parseFEN } from './core/fen';
 
-type ActiveTab = 'learn' | 'practice' | 'play' | 'two-player' | 'analysis' | 'editor';
+type ActiveTab = 'learn' | 'openings' | 'practice' | 'play' | 'two-player' | 'analysis' | 'editor';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('learn');
@@ -77,6 +78,15 @@ export default function App() {
           >
             <span className="tab-icon">🎓</span>
             <span className="tab-text">Học Cờ</span>
+          </button>
+          <button
+            className={`nav-tab-btn ${activeTab === 'openings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('openings')}
+            role="tab"
+            aria-selected={activeTab === 'openings'}
+          >
+            <span className="tab-icon">📖</span>
+            <span className="tab-text">Khai Cuộc</span>
           </button>
           <button
             className={`nav-tab-btn ${activeTab === 'practice' ? 'active' : ''}`}
@@ -157,6 +167,13 @@ export default function App() {
       {/* Main View Area */}
       <main className="main-content-area">
         {activeTab === 'learn' && <LearnView pieceSet={pieceSet} />}
+        {activeTab === 'openings' && (
+          <OpeningExplorerView
+            pieceSet={pieceSet}
+            onPlayWithAI={handlePlayFromEditor}
+            onAnalyze={(board, moves) => handleStartAnalysis(board, moves)}
+          />
+        )}
         {activeTab === 'practice' && <PracticeView pieceSet={pieceSet} />}
         {activeTab === 'play' && (
           <PlayView
@@ -200,6 +217,15 @@ export default function App() {
         >
           <span className="mobile-tab-icon">🎓</span>
           <span className="mobile-tab-text">Học Cờ</span>
+        </button>
+        <button
+          className={`mobile-tab-btn ${activeTab === 'openings' ? 'active' : ''}`}
+          onClick={() => setActiveTab('openings')}
+          role="tab"
+          aria-selected={activeTab === 'openings'}
+        >
+          <span className="mobile-tab-icon">📖</span>
+          <span className="mobile-tab-text">Khai Cuộc</span>
         </button>
         <button
           className={`mobile-tab-btn ${activeTab === 'practice' ? 'active' : ''}`}
